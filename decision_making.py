@@ -44,6 +44,7 @@ def decision_making(loop, ct, scheme_id, state_list, action_list, lastOutput_lis
         if state_list[scheme_id].Is_D2D_Link_Active and \
         (UE_ID_BS2UE_link_Current == state_list[scheme_id].Tx_ID_D2D_Link or \
          UE_ID_BS2UE_link_Current == state_list[scheme_id].Rx_ID_D2D_Link):
+            pdb.set_trace()
             sys.exit('Cannot serve the user who is in the current D2D link!');
     action_list[scheme_id].UE_ID_BS2UE_Link = UE_ID_BS2UE_link_Current; 
     
