@@ -44,9 +44,9 @@ def env_init(Netw_topo_id):
         target_prob_blockage = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
     if Netw_topo_id == 2:
         N_UE = 5; # Number of users 
-        radius = np.array([15, 15, 25, 40, 40]);  # Distance between Tx and Rx
+        radius = np.array([15, 15, 25, 35, 35]);  # Distance between Tx and Rx
         angle =  np.array([5, 85, 45, 15, 75]);    # Angle between Tx and Rx
-        target_prob_blockage = np.array([0.1, 0.1, 0.1, 0.9, 0.9]); # Average percentage of slots in blockage
+        target_prob_blockage = np.array([0.1, 0.1, 0.1, 0.8, 0.8]); # Average percentage of slots in blockage
     if Netw_topo_id == 3: 
         N_UE = 5; # Number of users 
         radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
