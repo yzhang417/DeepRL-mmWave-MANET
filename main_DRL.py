@@ -33,7 +33,7 @@ def main():
     parser.add_argument('--training', default=True, type=int, help='enable training phase')
     parser.add_argument('--testing', default=False, type=int, help='enable testing phase')
     parser.add_argument('--cudaid', default=0, type=int, help='id of CUDA')
-    parser.add_argument('--cuda', default=1, type=int, help='use to enable available CUDA')
+    parser.add_argument('--cuda', default=0, type=int, help='use to enable available CUDA')
     parser.add_argument('--gamma', default=0.999, type=float, help='gamma parameter for GAE')
     parser.add_argument('--lambd', default=1.00, type=float, help='lambda parameter for GAE')
     parser.add_argument('--value_coeff', default=0.5, type=float, help='value loss coeffecient')
@@ -43,6 +43,7 @@ def main():
     parser.add_argument('--save_path', default='trained_model.pt', help='path to save the trained DRL agent')
     parser.add_argument('--load_path', default=os.getcwd()+'/trained_model.pt', help='path to load the nn models')
     parser.add_argument('--all_var_path', default='all_vars_out', help='path to save all variable')
+    parser.add_argument('--Netw_topo_id', default=1, type=int, help='Id of network topology')
     args = parser.parse_args()
     for item in vars(args):
         print(item + ': ' + str(getattr(args, item)))
@@ -58,7 +59,8 @@ def main():
     if args.training:
         # Create an instance of enviroment and print key system parameters
         slots = args.slots
-        env_parameter = env_init()
+        Netw_topo_id = args.Netw_topo_id
+        env_parameter = env_init(Netw_topo_id)
         env = envs(env_parameter,slots)
         print('Training with ' + device_name)
         print('Time slot duration is %f seconds' %env_parameter.t_slot)

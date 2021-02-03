@@ -79,9 +79,9 @@ def plot_network_topology(env_parameter):
     for u in range(env_parameter.N_UE):
         ax_netw_topo.plot(env_parameter.Xcoor_list[u],env_parameter.Ycoor_list[u],'-',\
                           c=ue_color[u],linewidth=0.1, markersize=0.1)
-    plt.savefig('Network_topology'+str(env_parameter.Netw_topo_id)+'.png',format='png')
+    plt.savefig('output/Network_topology'+str(env_parameter.Netw_topo_id)+'.png',format='png')
     plt.show()
-
+    
 
 #-------------------------------------------------------------------------
 # Plot last evaluation result
@@ -130,4 +130,3 @@ def plot_last_evaluation_result(all_rewards,Queue_Eval,Delay_dist_Eval,slots):
     plt.ylabel('Prob (delay <= t)')
     plt.savefig('CDF_delay_last_evaluation.png',format='png')
     plt.show()
-    

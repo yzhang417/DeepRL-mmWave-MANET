@@ -5,7 +5,9 @@ import math
 import pdb
 
 
-###########################################################################
+#----------------------------------------------------
+# class of state
+#----------------------------------------------------
 class def_state():
     def __init__(self,env_parameter):
         self.Queue_length = np.zeros(env_parameter.N_UE);
@@ -83,7 +85,9 @@ class def_state():
         return len(self.to_ndarray_normalized())
     
 
-###########################################################################
+#----------------------------------------------------
+# class of action
+#----------------------------------------------------
 class def_action():
     def __init__(self, env_parameter, action_array = False):
         self.num_UE = int(env_parameter.N_UE)
@@ -132,7 +136,10 @@ class def_action():
     def _ndarray_length(self):
         return len(self.to_ndarray())
 
-###########################################################################
+    
+#----------------------------------------------------
+# class of output of enviroment
+#----------------------------------------------------
 class def_output():
     def __init__(self, env_parameter):
         self.npkts_departed_D2D_Link = 0;

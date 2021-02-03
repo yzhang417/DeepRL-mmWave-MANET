@@ -33,23 +33,25 @@ class def_env_para():
 #-----------------------------------------------------------------------
 
 
-def env_init():    
+def env_init(Netw_topo_id):    
     # -------------------------------------
     # Network topology
     # -------------------------------------
-    Netw_topo_id = 1;
     if Netw_topo_id == 1:
         N_UE = 5; # Number of users 
         radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
         angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
+        target_prob_blockage = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
     if Netw_topo_id == 2:
         N_UE = 5; # Number of users 
-        radius = np.array([10, 15, 25, 35, 45]);  # Distance between Tx and Rx
-        angle =  np.array([0, 0, 0, 0, 0]);    # Angle between Tx and Rx
+        radius = np.array([10, 10, 20, 35, 35]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45, 15, 75]);    # Angle between Tx and Rx
+        target_prob_blockage = np.array([0.1, 0.1, 0.1, 0.65, 0.65]); # Average percentage of slots in blockage
     if Netw_topo_id == 3: 
         N_UE = 5; # Number of users 
         radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
         angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
+        target_prob_blockage = np.array([0.1, 0.1, 0.1, 0.65, 0.65]); # Average percentage of slots in blockage
     Xcoor_init, Ycoor_init = pol2cart(np.deg2rad(angle),radius);
 
 
@@ -88,7 +90,6 @@ def env_init():
     max_blockage_duration = 6; # Number of maximum slots that blockage exists
     min_blockage_duration_guess = 1;   # Guess of min_blockage_duration
     max_blockage_duration_guess = 10;  # Guess of max_blockage_duration
-    target_prob_blockage = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
     prob_blockage = target_prob_blockage/\
     (target_prob_blockage+(min_blockage_duration+max_blockage_duration)/2*(1-target_prob_blockage))  
     

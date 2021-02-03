@@ -13,7 +13,8 @@ from my_utils import *
 # Calculate optimal beamwidth for each UE
 #----------------------------------------------------
 def calculate_ground_truth_optimal_beamwidth(slots, LOOP):
-    env_parameter = env_init()
+    Netw_topo_id = 1
+    env_parameter = env_init(Netw_topo_id)
     envEvaluation = envs(env_parameter,slots)
     reff_statistic = np.zeros((LOOP,env_parameter.N_UE,len(env_parameter.BeamWidth_TX_vec)))
     final_eff_coeff = np.zeros((LOOP,env_parameter.N_UE,len(env_parameter.BeamWidth_TX_vec)))
@@ -77,7 +78,8 @@ def plot_reff_statistic(reff_statistic, final_eff_coeff, outage_coeff, env_param
 # under different location, velocity, beamwidth and self-rotation
 # ---------------------------------------------------------------
 def calculate_outage_statistic(slots, LOOP):
-    env_parameter = env_init()
+    Netw_topo_id = 1
+    env_parameter = env_init(Netw_topo_id)
     env_parameter.max_activity_range = 5
     env_parameter.max_number_last_rotate = 0
     env_parameter.max_number_last_direction = 0
