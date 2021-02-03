@@ -16,9 +16,7 @@ from state_action import *
 
 
 #-----------------------------------------------------------------------
-#-----------------------------------------------------------------------
 # Class of parameters configuring the wireless system
-#-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
 class def_env_para():
     def __init__(self):
@@ -26,14 +24,11 @@ class def_env_para():
     
 
 #-----------------------------------------------------------------------
-#-----------------------------------------------------------------------
 # Following function allows configuring the studied wirelss system and 
 # will return an instance of def_env_para consisting of necesary parameters
 #-----------------------------------------------------------------------
-#-----------------------------------------------------------------------
-
-
 def env_init(Netw_topo_id):    
+    
     # -------------------------------------
     # Network topology
     # -------------------------------------
@@ -41,18 +36,20 @@ def env_init(Netw_topo_id):
         N_UE = 5; # Number of users 
         radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
         angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
+        lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
         target_prob_blockage = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
     if Netw_topo_id == 2:
         N_UE = 5; # Number of users 
-        radius = np.array([15, 15, 25, 35, 35]);  # Distance between Tx and Rx
-        angle =  np.array([5, 85, 45, 15, 75]);    # Angle between Tx and Rx
-        target_prob_blockage = np.array([0.1, 0.1, 0.1, 0.8, 0.8]); # Average percentage of slots in blockage
+        radius = np.array([15, 15, 25, 30, 35]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45, 10, 75]);   # Angle between Tx and Rx
+        lambda_ratio = np.array([1.5, 1, 1, 0.75, 0.75]); # Ratio of arrival rate
+        target_prob_blockage = np.array([0.1, 0.1, 0.05, 0.75, 0.75]); # Average percentage of slots in blockage
     if Netw_topo_id == 3: 
         N_UE = 5; # Number of users 
         radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
         angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
-        target_prob_blockage = np.array([0.1, 0.1, 0.1, 0.75, 0.75]); # Average percentage of slots in blockage
-        target_prob_blockage = np.array([0.1, 0.1, 0.1, 1, 1]); # Average percentage of slots in blockage
+        lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage = np.array([0.2, 0.2, 0.2, 0.2, 0.2]); # Average percentage of slots in blockage
     Xcoor_init, Ycoor_init = pol2cart(np.deg2rad(angle),radius);
 
 
@@ -100,7 +97,6 @@ def env_init(Netw_topo_id):
     # -------------------------------------
     workload = 1.0 * 1e9;                              # Total downlink data stream rate
     mean_packet_size = 2312*8;                         # Mean size of a single packet in bit
-    lambda_ratio = np.array([1, 1, 1, 1, 1]);          # Scales of arrival rate
     lambda_ratio = lambda_ratio/np.sum(lambda_ratio);  
     total_arrival_rate = workload/mean_packet_size;    # Total packet arrival rate
     lambda_vec = lambda_ratio * total_arrival_rate;    # Packet arrival rate for each user
@@ -297,14 +293,9 @@ def env_init(Netw_topo_id):
     return env_parameter
 
 
-
-
-#-----------------------------------------------------------------------
 #-----------------------------------------------------------------------
 # In the following class, we create a enviroment
 #-----------------------------------------------------------------------
-#-----------------------------------------------------------------------
-
 class envs():
     # -------------------------------------
     # Initialization
