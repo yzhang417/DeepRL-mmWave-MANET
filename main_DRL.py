@@ -40,8 +40,8 @@ def main():
     parser.add_argument('--entropy_coeff', default=0.05, type=float, help='entropy loss coeffecient')
     parser.add_argument('--eval_loops', default=5, type=int, help='number of evaluations for a checkpoint')
     parser.add_argument('--eval_ites', default=10, type=int, help='number of iterations before each ckpt evaluation')
-    parser.add_argument('--save_path', default='trained_model.pt', help='path to save the trained DRL agent')
-    parser.add_argument('--load_path', default=os.getcwd()+'/trained_model.pt', help='path to load the nn models')
+    parser.add_argument('--save_path', default='trained_model_netwTopo', help='path to save the trained DRL agent')
+    parser.add_argument('--load_path', default=os.getcwd()+'/trained_model_netwTopo', help='path to load the nn models')
     parser.add_argument('--all_var_path', default='all_vars_out', help='path to save all variable')
     parser.add_argument('--Netw_topo_id', default=1, type=int, help='Id of network topology')
     args = parser.parse_args()
@@ -89,7 +89,7 @@ def main():
         eval_ites = args.eval_ites
         decaying_clip_param = False
         clipping_critic = True
-        save_path = os.getcwd()+'/'+args.save_path
+        save_path = os.getcwd()+'/'+args.save_path+str(Netw_topo_id)+'.pt'
         
         # Training
         print('\n------------------------------------------------------')
