@@ -852,3 +852,15 @@ class envs():
 
         # Return object
         return output
+    
+    
+# -------------------------------------
+# Run the enviroment for one time slot for bug checking
+# -------------------------------------
+    def step2(self, state, action, channel):
+        # Check whether the episode ends
+        if self.ct == self.slots_monitored-1:
+            done = True
+        else:
+            done = False
+            self.ct += 1
