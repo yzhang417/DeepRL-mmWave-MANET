@@ -108,7 +108,7 @@ def main():
             }, save_path) 
         
         # Plot last evaluation result
-        plot_last_evaluation_result(all_rewards,Queue_Eval,Delay_dist_Eval,slots)
+        plot_last_evaluation_result(all_rewards,Queue_Eval,Delay_dist_Eval,slots,Netw_topo_id)
         
         # Save all variable
         filename = os.getcwd() + '/' + args.all_var_path
