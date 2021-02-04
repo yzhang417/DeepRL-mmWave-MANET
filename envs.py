@@ -473,7 +473,7 @@ class envs():
         # Update the state
         state.est_depart = est_depart
         state.est_arrival = est_arrival
-        state.Reff_BS2UE_Estimated = Reff_BS2UE_Estimated
+        state.Reff_BS2UE_Estimated = Reff_BS2UE_Estimated + 1e-8  # Avoid -inf * 0 when Reff_BS2UE_Estimated = 0 
         state.n_BS2UE = n_BS2UE
         state.Reff_BS2UE_Link_Last_Slot = output.Reff_BS2UE_Link
         state.Is_D2D_Link_Active = action.Is_D2D_Link_Activated_For_Next_Slot
