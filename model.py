@@ -1,3 +1,5 @@
+# This Python file uses the following encoding: utf-8
+# coding=utf-8
 import torch
 import torch.nn as nn
 import pdb
