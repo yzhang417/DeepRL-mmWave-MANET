@@ -30,7 +30,7 @@ def cdf_dist_P_vs_b(queue_length,n_linspace):
 #-------------------------------------------------------------------------
 # Plot network topology
 #-------------------------------------------------------------------------
-def plot_network_topology(env_parameter):
+def plot_network_topology(env_parameter,output_folder):
     ue_color = ['b','g','c','m','k']
     number_dots_border = range(360);
     Xcoor_border = env_parameter.max_activity_range * np.cos(np.radians(number_dots_border))
@@ -54,14 +54,14 @@ def plot_network_topology(env_parameter):
         ax_netw_topo.plot(env_parameter.Xcoor_list[u],env_parameter.Ycoor_list[u],'-',\
                           c=ue_color[u],linewidth=0.1, markersize=0.1)
     Netw_topo_id = env_parameter.Netw_topo_id
-    plt.savefig('output_net'+str(Netw_topo_id)+'/Network_topology'+str(env_parameter.Netw_topo_id)+'.png',format='png')
+    plt.savefig(output_folder+'Network_topology'+str(env_parameter.Netw_topo_id)+'.png',format='png')
     plt.show()
     
 
 #-------------------------------------------------------------------------
 # Plot last evaluation result
 #-------------------------------------------------------------------------
-def plot_last_evaluation_result(all_rewards,Queue_Eval,Delay_dist_Eval,slots,Netw_topo_id):
+def plot_last_evaluation_result(all_rewards, Queue_Eval, Delay_dist_Eval, slots, Netw_topo_id, output_folder):
     plt.rcParams.update({'font.size': 16})
     plt.rcParams.update({'axes.labelsize': 18})
     plt.rcParams.update({'legend.fontsize': 12})
@@ -73,7 +73,7 @@ def plot_last_evaluation_result(all_rewards,Queue_Eval,Delay_dist_Eval,slots,Net
     plt.plot(range(len(all_rewards)),all_rewards);
     plt.xlabel('Training Iteration');
     plt.ylabel('Rewards');
-    plt.savefig('output_net'+str(Netw_topo_id)+'/Training_evolution.png',format='png')
+    plt.savefig(output_folder+'Training_evolution.png',format='png')
 
     mean_queue_length = np.mean(Queue_Eval,axis=2)
     mean_queue_length = np.mean(mean_queue_length,axis=0)
@@ -84,14 +84,14 @@ def plot_last_evaluation_result(all_rewards,Queue_Eval,Delay_dist_Eval,slots,Net
     plt.plot(b,P)
     plt.xlabel('Averaged queue length q')
     plt.ylabel('Prob (queue length > q)')
-    plt.savefig('output_net'+str(Netw_topo_id)+'/CDF_queue_length_last_evaluation.png',format='png')
+    plt.savefig(output_folder+'CDF_queue_length_last_evaluation.png',format='png')
 
     plt.figure(num=4,figsize=(7,7),dpi=100)
     plt.title('Evolution of average queue length')
     plt.plot(range(slots),mean_queue_length[0:slots])
     plt.xlabel('Time slot index')
     plt.ylabel('Average queue length')
-    plt.savefig('output_net'+str(Netw_topo_id)+'/Evolution_queue_length_last_evaluation.png',format='png')
+    plt.savefig(output_folder+'Evolution_queue_length_last_evaluation.png',format='png')
     
     ave_Delay_dist_Eval = np.mean(np.mean(Delay_dist_Eval,axis=2),axis=0)
     ave_Delay_dist = ave_Delay_dist_Eval/np.sum(ave_Delay_dist_Eval)
@@ -103,5 +103,5 @@ def plot_last_evaluation_result(all_rewards,Queue_Eval,Delay_dist_Eval,slots,Net
     plt.plot(range(max_delay_to_show),ave_Delay_CDF[0:max_delay_to_show+1])
     plt.xlabel('Averaged delay in slots t')
     plt.ylabel('Prob (delay <= t)')
-    plt.savefig('output_net'+str(Netw_topo_id)+'/CDF_delay_last_evaluation.png',format='png')
+    plt.savefig(output_folder+'CDF_delay_last_evaluation.png',format='png')
     plt.show()
