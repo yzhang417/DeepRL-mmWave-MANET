@@ -20,7 +20,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
              batches, slots, iterations, \
              gamma, lambd, value_coeff, entropy_coeff, \
              clip_param, decaying_clip_param, clipping_critic,\
-             eval_loops, eval_ites, savepath, device):
+             eval_loops, eval_ites, device):
     
     # Init
     all_rewards = []
@@ -201,8 +201,6 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             ps = pstats.Stats(pr, stream=s).sort_stats(sortby)
             ps.print_stats(10)
             print(s.getvalue())
-    # Save the model and return the rewards of all bathces
-    # save_ckpt(ite, savepath, loss, actor_critic_net, ac_optimizer)
     
     # Return results
     return all_rewards, Queue_Eval, Delay_dist_Eval, actor_critic_net
