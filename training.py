@@ -7,7 +7,7 @@ import pdb
 import torch
 import cProfile, pstats, io
 from pstats import SortKey
-from model_single_pi import *
+from model import *
 from envs import *
 from state_action import *
 from my_utils import *
@@ -118,7 +118,10 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
                 else:
                     Advs = advantages
                 
-                #------------------------------------Calculate loss------------------------------------
+                
+                #------------------------------------
+                # Calculate loss
+                #------------------------------------
                 # Actor loss
                 ratios = torch.stack(ratios)
                 surr1 = ratios * Advs.detach()
@@ -275,7 +278,6 @@ def action_index_to_action_ndarray(action_chosen_index,num_type_of_action,num_ac
     return action_ndarray
 
 
-
 #-----------------------------------------------------------
 # Convert a action ndarray to a instance of def_action
 #-----------------------------------------------------------
@@ -289,7 +291,6 @@ def action_ndarray_to_action_index(action_ndarray,num_type_of_action,num_action_
     else:
         action_index = action_index + num_action_per_type[0]*num_action_per_type[1]
     return action_index
-
 
 
 #-----------------------------------------------------------

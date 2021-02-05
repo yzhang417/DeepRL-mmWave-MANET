@@ -77,7 +77,7 @@ class model(nn.Module):
         # Sanity check of distribution
         if torch.isnan(pi.sum()) or abs(pi.sum() - 1) > 1e-5:
             pdb.set_trace()
-            sys.exit('Wrong distribution in model_single_pi.py')
+            sys.exit('Wrong distribution in model.py')
         
         # Return value function and policy
         return vpred, pi

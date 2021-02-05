@@ -3,14 +3,17 @@ import numpy as np
 import torch
 import torch.optim as optim
 from envs import *
-from model_single_pi import *
-from training_single_pi import *
+from model import *
+from training import *
 from my_utils import *
 import shelve
 import pdb
 import cProfile
 import platform
 
+#-----------------------------------------------------------
+# main function
+#-----------------------------------------------------------
 def main():
     print('\r\n------------------------------------')
     print('Enviroment Sumamry')
@@ -18,7 +21,9 @@ def main():
     print('PyTorch ' + str(torch.__version__))
     print('Running with Python ' + str(platform.python_version()))    
     
-    ############---------Parse command line arguments---------############
+    #-----------------------------------------------------------
+    #Parse command line arguments
+    #-----------------------------------------------------------
     print('\r\n------------------------------------')
     print('System Parameters')
     print('------------------------------------')
@@ -48,14 +53,18 @@ def main():
     for item in vars(args):
         print(item + ': ' + str(getattr(args, item)))
     
-    ############---------Training device---------############
+    #-----------------------------------------------------------
+    #Training device selection
+    #-----------------------------------------------------------
     if args.cuda and torch.cuda.is_available(): 
         device_name = 'cuda:'+str(args.cudaid)
     else: 
         device_name = 'cpu'
     device = torch.device(device_name)
 
-    ############---------Training---------############
+    #-----------------------------------------------------------
+    #Training
+    #-----------------------------------------------------------
     if args.training:
         # Create an instance of enviroment and print key system parameters
         slots = args.slots
@@ -114,11 +123,12 @@ def main():
         filename = os.getcwd() + '/' + args.all_var_path
         # To be done
     
-    
-    # Doing a complete evaluation with benchmarking algorithms
+    #-----------------------------------------------------------
+    # Testing with and comparing with benchmarking algorithms
+    #-----------------------------------------------------------
     if args.testing:
-        print('-------------------------------------------------------')
-        print('-------------------Starting Testing--------------------')
+        print('\n------------------------------------------------------')
+        print('Starting Testing')
         print('-------------------------------------------------------')
         # Load saved variable and print parameters
         
@@ -133,6 +143,7 @@ def main():
         # Plot trained results
         plot_last_evaluation_result(all_rewards,Queue_Eval,slots)
         pass
-    
+
+
 if __name__ == "__main__":
     main()
