@@ -5,33 +5,7 @@ import math
 import pdb
 import matplotlib.pyplot as plt
 
-        
-#-------------------------------------------------------------------------
-# parameter for bw bandit 
-#-------------------------------------------------------------------------   
-class def_bandit_bw_parameter():
-    def __init__(self, env_parameter):
-        K_bw = env_parameter.K_bw;
-        M = env_parameter.M;
-        N_UE = env_parameter.N_UE;
-        self.alpha_uwmts = np.ones((K_bw,M+1,N_UE));  
-        self.UWMTS_CountLeader = np.zeros((K_bw,N_UE));
-        self.UWMTS_Num_Codebook_Use = np.zeros((K_bw,N_UE));
-        self.UWMTS_Mean_Codebook = np.zeros((K_bw,N_UE));
-        self.UWMTS_Mean_Codebook[:] = math.inf;
-        
-        
-#-------------------------------------------------------------------------
-# parameter for relay bandit 
-#-------------------------------------------------------------------------        
-class def_bandit_relay_parameter():
-    def __init__(self,env_parameter):
-        K_relay = env_parameter.K_relay;
-        M = env_parameter.M;
-        N_UE = env_parameter.N_UE;        
-        self.alpha_wmts = np.ones((K_relay,M+1,N_UE));
 
-        
 #-------------------------------------------------------------------------
 # Transform cartesian coordinates to polar coordiantes 
 #-------------------------------------------------------------------------
@@ -79,7 +53,8 @@ def plot_network_topology(env_parameter):
     for u in range(env_parameter.N_UE):
         ax_netw_topo.plot(env_parameter.Xcoor_list[u],env_parameter.Ycoor_list[u],'-',\
                           c=ue_color[u],linewidth=0.1, markersize=0.1)
-    plt.savefig('output/Network_topology'+str(env_parameter.Netw_topo_id)+'.png',format='png')
+    Netw_topo_id = env_parameter.Netw_topo_id
+    plt.savefig('output_net'+str(Netw_topo_id)+'/Network_topology'+str(env_parameter.Netw_topo_id)+'.png',format='png')
     plt.show()
     
 
@@ -98,7 +73,7 @@ def plot_last_evaluation_result(all_rewards,Queue_Eval,Delay_dist_Eval,slots,Net
     plt.plot(range(len(all_rewards)),all_rewards);
     plt.xlabel('Training Iteration');
     plt.ylabel('Rewards');
-    plt.savefig('output_net'+str(Netw_topo_id)+'Training_evolution.png',format='png')
+    plt.savefig('output_net'+str(Netw_topo_id)+'/Training_evolution.png',format='png')
 
     mean_queue_length = np.mean(Queue_Eval,axis=2)
     mean_queue_length = np.mean(mean_queue_length,axis=0)
@@ -109,14 +84,14 @@ def plot_last_evaluation_result(all_rewards,Queue_Eval,Delay_dist_Eval,slots,Net
     plt.plot(b,P)
     plt.xlabel('Averaged queue length q')
     plt.ylabel('Prob (queue length > q)')
-    plt.savefig('output_net'+str(Netw_topo_id)+'CDF_queue_length_last_evaluation.png',format='png')
+    plt.savefig('output_net'+str(Netw_topo_id)+'/CDF_queue_length_last_evaluation.png',format='png')
 
     plt.figure(num=4,figsize=(7,7),dpi=100)
     plt.title('Evolution of average queue length')
     plt.plot(range(slots),mean_queue_length[0:slots])
     plt.xlabel('Time slot index')
     plt.ylabel('Average queue length')
-    plt.savefig('output_net'+str(Netw_topo_id)+'Evolution_queue_length_last_evaluation.png',format='png')
+    plt.savefig('output_net'+str(Netw_topo_id)+'/Evolution_queue_length_last_evaluation.png',format='png')
     
     ave_Delay_dist_Eval = np.mean(np.mean(Delay_dist_Eval,axis=2),axis=0)
     ave_Delay_dist = ave_Delay_dist_Eval/np.sum(ave_Delay_dist_Eval)
@@ -128,5 +103,5 @@ def plot_last_evaluation_result(all_rewards,Queue_Eval,Delay_dist_Eval,slots,Net
     plt.plot(range(max_delay_to_show),ave_Delay_CDF[0:max_delay_to_show+1])
     plt.xlabel('Averaged delay in slots t')
     plt.ylabel('Prob (delay <= t)')
-    plt.savefig('output_net'+str(Netw_topo_id)+'CDF_delay_last_evaluation.png',format='png')
+    plt.savefig('output_net'+str(Netw_topo_id)+'/CDF_delay_last_evaluation.png',format='png')
     plt.show()
