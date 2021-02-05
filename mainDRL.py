@@ -132,7 +132,7 @@ def main():
             }, trained_model_filename) 
         
         # Save all variable
-        training_results_filename = output_folder+'/training_results_netwTopo'+str(Netw_topo_id)+'.dat'
+        training_results_filename = output_folder+'/training_results_netwTopo'+str(Netw_topo_id)+'.pt'
         training_results_dict = {
             'args': args,
             'env_parameter': env_parameter,
@@ -159,7 +159,7 @@ def main():
         print('Starting Testing')
         print('-------------------------------------------------------')
         # Load saved variable and print parameters
-        training_results_filename = output_folder+'/training_results_netwTopo'+str(Netw_topo_id)+'.dat'
+        training_results_filename = output_folder+'/training_results_netwTopo'+str(Netw_topo_id)+'.pt'
         infile = open(training_results_filename,'rb')
         training_results_dict = pickle.load(infile)
         infile.close()
