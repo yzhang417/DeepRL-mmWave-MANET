@@ -11,6 +11,7 @@ import random
 import pdb
 from my_utils import *
 from state_action import *
+import copy
 # from scipy.ndimage.interpolation import shift
 # numpy.pad is much more efficient than shift
 
@@ -301,7 +302,7 @@ class envs():
     # Initialization
     # -------------------------------------
     def __init__(self,env_parameter,slots_monitored):
-        self.env_parameter = env_parameter
+        self.env_parameter = copy.deepcopy(env_parameter)
         self.slots_monitored = slots_monitored
         self.is_external_packet_arrival_process = False
         # Following would be reset when reset() called
@@ -852,15 +853,3 @@ class envs():
 
         # Return object
         return output
-    
-    
-# -------------------------------------
-# Run the enviroment for one time slot for bug checking
-# -------------------------------------
-    def step2(self, state, action, channel):
-        # Check whether the episode ends
-        if self.ct == self.slots_monitored-1:
-            done = True
-        else:
-            done = False
-            self.ct += 1
