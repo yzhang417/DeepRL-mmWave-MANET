@@ -1,11 +1,39 @@
-# Unimodal Weighted Multimonial TS Gamma = 3
 import numpy as np
 import sys
 import operator 
 import math
 import pdb
 
-def bandit_bw_selection(bandit_bw_para,action,env_parameter):
+#-------------------------------------------------------------------------
+# parameter for bw bandit 
+#-------------------------------------------------------------------------   
+class def_bandit_bw_parameter():
+    def __init__(self, env_parameter):
+        K_bw = env_parameter.K_bw;
+        M = env_parameter.M;
+        N_UE = env_parameter.N_UE;
+        self.alpha_uwmts = np.ones((K_bw,M+1,N_UE));  
+        self.UWMTS_CountLeader = np.zeros((K_bw,N_UE));
+        self.UWMTS_Num_Codebook_Use = np.zeros((K_bw,N_UE));
+        self.UWMTS_Mean_Codebook = np.zeros((K_bw,N_UE));
+        self.UWMTS_Mean_Codebook[:] = math.inf;
+        
+        
+#-------------------------------------------------------------------------
+# parameter for relay bandit 
+#-------------------------------------------------------------------------        
+class def_bandit_relay_parameter():
+    def __init__(self,env_parameter):
+        K_relay = env_parameter.K_relay;
+        M = env_parameter.M;
+        N_UE = env_parameter.N_UE;        
+        self.alpha_wmts = np.ones((K_relay,M+1,N_UE));
+
+        
+#-------------------------------------------------------------------------
+# Bandit BW selection
+#------------------------------------------------------------------------- 
+def bandit_bw_selection(bandit_bw_para, action, env_parameter):
     is_unimodal = False;
     K = env_parameter.K_bw;
     UE_ID = action.Relay_ID;
@@ -19,7 +47,6 @@ def bandit_bw_selection(bandit_bw_para,action,env_parameter):
         gamma_UWMTS = env_parameter.gamma_UWMTS;
     else:
         gamma_UWMTS = 10e9;
-        
     if np.isinf(np.amax(UWMTS_Mean_Codebook)):
         It = np.argmax(UWMTS_Mean_Codebook)
         UWMTS_CountLeader[It] = 0;
@@ -47,8 +74,10 @@ def bandit_bw_selection(bandit_bw_para,action,env_parameter):
     return It, bandit_bw_para
 
 
-
-def bandit_relay_selection(bandit_relay_para,state,action,env_parameter):
+#-------------------------------------------------------------------------
+# Bandit relay selection
+#------------------------------------------------------------------------- 
+def bandit_relay_selection(bandit_relay_para, state, action, env_parameter):
     K = env_parameter.K_relay;
     RateNor = env_parameter.RateNor;
     UE_ID = action.UE_ID_BS2UE_Link;
@@ -76,7 +105,10 @@ def bandit_relay_selection(bandit_relay_para,state,action,env_parameter):
     return It
 
 
-def update_bandit_bw_para(bandit_bw_para,action,output,env_parameter):
+#-------------------------------------------------------------------------
+# Bandit parameter update for bw selection
+#------------------------------------------------------------------------- 
+def update_bandit_bw_para(bandit_bw_para, action, output, env_parameter):
     RateNor = env_parameter.RateNor;
     Coeff_BS2UE = env_parameter.Coeff_BS2UE;
     mt = output.MCS_ID_BS2UE;
@@ -99,7 +131,9 @@ def update_bandit_bw_para(bandit_bw_para,action,output,env_parameter):
     return bandit_bw_para
 
 
-
+#-------------------------------------------------------------------------
+# Bandit parameter update for relay selection
+#------------------------------------------------------------------------- 
 def update_bandit_relay_para(bandit_relay_para,state,action,output,env_parameter):
     UE_ID = output.action.UE_ID_BS2UE_Link;
     mt1 = output.MCS_ID_BS2UE;
