@@ -86,8 +86,8 @@ def calculate_outage_statistic(slots, LOOP):
     env_parameter.max_number_last_rotate = 0
     env_parameter.max_number_last_direction = 0
     envEvaluation = envs(env_parameter,slots)
-    ue_velocity_vec = np.array([0,2,4,6,8,10])
-    ue_selfrotate_vec = np.array([0,2,4,6,8])
+    ue_velocity_vec = np.array([0,5,10,15,20])
+    ue_selfrotate_vec = np.array([0,10,100,200,250])
     outage = np.zeros((LOOP,\
                        env_parameter.N_UE,\
                        len(ue_velocity_vec),\
@@ -126,7 +126,7 @@ def plot_outage_trend(outage, ue_velocity_vec, ue_selfrotate_vec, env_parameter)
     outage_mean = np.mean(outage,axis=0)
     
     # Effect of UE velocity
-    fig1 = plt.figure(figsize=(16,12),dpi=100)
+    fig1 = plt.figure(figsize=(16,12),dpi=200)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
     axD = []
     axD.append(fig1.add_subplot(321))
@@ -138,14 +138,15 @@ def plot_outage_trend(outage, ue_velocity_vec, ue_selfrotate_vec, env_parameter)
         for bw_id in range(len(env_parameter.BeamWidth_TX_vec)):
             axD[ue_id].plot(ue_velocity_vec,outage_mean[ue_id,:,0,bw_id],\
                             label='BW: '+str(env_parameter.BeamWidth_TX_vec[bw_id])+' degrees')
-            axD[ue_id].set_title('Effect of UE velocity for UE id '+str(ue_id))
+            axD[ue_id].set_title('Effect of UE velocity for UE id '+str(ue_id)+' distance: '+str(env_parameter.radius[ue_id])+' m')
             axD[ue_id].grid(b=True, which='major', color='#666666', linestyle='-')
             axD[ue_id].legend()
             axD[ue_id].set_xlabel('UE velocity (m/s)')
             axD[ue_id].set_ylabel('Outage coefficent')
+    plt.savefig('Effect_UE_velocity.png',format='png', facecolor='w', transparent=False)
 
     # Effect of UE self-rotation rate
-    fig2 = plt.figure(figsize=(16,12),dpi=100)
+    fig2 = plt.figure(figsize=(16,12),dpi=200)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
     axR = []
     axR.append(fig2.add_subplot(321))
@@ -162,9 +163,10 @@ def plot_outage_trend(outage, ue_velocity_vec, ue_selfrotate_vec, env_parameter)
             axR[ue_id].legend()
             axR[ue_id].set_xlabel('UE self-rotation (degrees/s)')
             axR[ue_id].set_ylabel('Outage coefficent')
+    plt.savefig('Effect_UE_rotation.png',format='png', facecolor='w', transparent=False)
             
     # Effect of UE distance
-    fig3 = plt.figure(figsize=(16,12),dpi=100)
+    fig3 = plt.figure(figsize=(16,12),dpi=200)
     plt.subplots_adjust(wspace=0.2, hspace=0.4)
     axV = []
     axV.append(fig3.add_subplot(321))
@@ -181,13 +183,14 @@ def plot_outage_trend(outage, ue_velocity_vec, ue_selfrotate_vec, env_parameter)
             axV[v_id].legend()
             axV[v_id].set_xlabel('UE distance (meters)')
             axV[v_id].set_ylabel('Outage coefficent')
+    plt.savefig('Effect_UE_distance.png',format='png', facecolor='w', transparent=False)
 
-    # Overall outage for each UE over velocity (0-10) and self-rotation (0-10)
+    # Overall outage for each UE over velocity and self-rotation
     fig4 = plt.figure(figsize=(7,7),dpi=100)
     ax = fig4.add_subplot(111)
     for u in range(env_parameter.N_UE):
         ax.plot(range(len(env_parameter.BeamWidth_TX_vec)),\
-                np.mean(np.mean(outage_mean[u,:,:,:],axis=0),axis=0),label='UE'+str(u))
+                np.mean(np.mean(outage_mean[u,0:3,0:2,:],axis=0),axis=0),label='UE'+str(u))
     ax.legend()
     ax.grid(b=True, which='major', color='#666666', linestyle='-')
     ax.set_xticks(range(len(env_parameter.BeamWidth_TX_vec)))
@@ -195,6 +198,7 @@ def plot_outage_trend(outage, ue_velocity_vec, ue_selfrotate_vec, env_parameter)
     ax.set_xlabel('Beamwidth (degrees)')
     ax.set_ylabel('Outage coefficent')
     ax.set_title('Average outage coefficent for different BW selection')
+    plt.savefig('Overall_outage.png',format='png', facecolor='w', transparent=False)
     plt.show();
     return np.mean(np.mean(outage_mean[:,:,:,:],axis=1),axis=1)
 
