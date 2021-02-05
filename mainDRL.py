@@ -34,6 +34,8 @@ def main():
     parser.add_argument('--cuda', default=0, type=int, help='use to enable available CUDA')
     parser.add_argument('--cudaid', default=0, type=int, help='id of CUDA')
     parser.add_argument('--Netw_topo_id', default=1, type=int, help='Id of network topology')
+    parser.add_argument('--output', default=None, help='output folder of training results')
+    
     # Training process
     parser.add_argument('--iterations', default=500, type=int, help='number of episodes')
     parser.add_argument('--slots', default=2000, type=int, help='number of slots in a single episode')
@@ -75,7 +77,10 @@ def main():
     #-----------------------------------------------------------
     #Check output folder
     #-----------------------------------------------------------
-    output_folder = 'output_net'+str(args.Netw_topo_id)+'/'
+    if args.output is not None:
+        output_folder = args.output+'/'
+    else:
+        output_folder = 'output_net'+str(args.Netw_topo_id)+'/'        
     if not os.path.exists(output_folder):
         os.makedirs(output_folder)
     
@@ -125,14 +130,14 @@ def main():
                  eval_loops, eval_ites, device)
         
         # Save the trained model result
-        trained_model_filename = output_folder+'/trained_model_netwTopo'+str(Netw_topo_id)+'.pt'
+        trained_model_filename = output_folder+'trained_model_netwTopo'+str(Netw_topo_id)+'.pt'
         torch.save({
             'model': actor_critic_net,
             'model_state_dict': actor_critic_net.state_dict(),
             }, trained_model_filename) 
         
         # Save all variable
-        training_results_filename = output_folder+'/training_results_netwTopo'+str(Netw_topo_id)+'.pt'
+        training_results_filename = output_folder+'training_results_netwTopo'+str(Netw_topo_id)+'.pt'
         training_results_dict = {
             'args': args,
             'env_parameter': env_parameter,
