@@ -13,10 +13,10 @@ def decision_making(loop, ct, scheme_id, state_list, action_list, lastOutput_lis
     # Queue length
     Queue_length_copy = copy.deepcopy(state_list[scheme_id].Queue_length).astype(np.float64);
     n_BS2UE_copy = copy.deepcopy(state_list[scheme_id].n_BS2UE);
-    
+
     # Last activated user
     state_list[scheme_id].UE_ID_BS2UE_Link_Last_Slot = lastOutput_list[scheme_id].action.UE_ID_BS2UE_Link;
-    
+
     # Check whether there is D2D link from last slot behavior
     state_list[scheme_id].Is_D2D_Link_Active = lastOutput_list[scheme_id].action.Is_D2D_Link_Activated_For_Next_Slot;
     if state_list[scheme_id].Is_D2D_Link_Active:
