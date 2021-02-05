@@ -51,6 +51,12 @@ def env_init(Netw_topo_id):
         angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
         lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
         target_prob_blockage = np.array([0.2, 0.2, 0.2, 0.2, 0.2]); # Average percentage of slots in blockage
+    if Netw_topo_id == 4: 
+        N_UE = 5; # Number of users 
+        radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
+        angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
+        lambda_ratio = np.array([1.5, 1, 1, 0.75, 0.75]); # Ratio of arrival rate
+        target_prob_blockage = np.array([0.2, 0.2, 0.2, 0.2, 0.2]); # Average percentage of slots in blockage
     Xcoor_init, Ycoor_init = pol2cart(np.deg2rad(angle),radius);
 
 
