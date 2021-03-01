@@ -86,8 +86,8 @@ def calculate_outage_statistic(slots, LOOP):
     env_parameter.max_number_last_rotate = 0
     env_parameter.max_number_last_direction = 0
     envEvaluation = envs(env_parameter,slots)
-    ue_velocity_vec = np.array([0,5,10,15,20])
-    ue_selfrotate_vec = np.array([0,10,100,200,250])
+    ue_velocity_vec = np.array([0,2.5,5,7.5,10])
+    ue_selfrotate_vec = np.array([0,2.5,5,7.5,10])
     outage = np.zeros((LOOP,\
                        env_parameter.N_UE,\
                        len(ue_velocity_vec),\
@@ -190,7 +190,7 @@ def plot_outage_trend(outage, ue_velocity_vec, ue_selfrotate_vec, env_parameter)
     ax = fig4.add_subplot(111)
     for u in range(env_parameter.N_UE):
         ax.plot(range(len(env_parameter.BeamWidth_TX_vec)),\
-                np.mean(np.mean(outage_mean[u,0:3,0:2,:],axis=0),axis=0),label='UE'+str(u))
+                np.mean(np.mean(outage_mean[u,:,:,:],axis=0),axis=0),label='UE'+str(u))
     ax.legend()
     ax.grid(b=True, which='major', color='#666666', linestyle='-')
     ax.set_xticks(range(len(env_parameter.BeamWidth_TX_vec)))
