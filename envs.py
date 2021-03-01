@@ -30,33 +30,40 @@ def env_init(Netw_topo_id):
     
     # -------------------------------------
     # Network topology
-    # -------------------------------------
+    # -------------------------------------    
     if Netw_topo_id == 1:
         N_UE = 5; # Number of users 
         radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
         angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
         lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
+        target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 2:
         N_UE = 5; # Number of users 
-        radius = np.array([15, 15, 25, 30, 35]);  # Distance between Tx and Rx
-        angle =  np.array([5, 85, 45, 10, 75]);   # Angle between Tx and Rx
-        lambda_ratio = np.array([1.5, 1, 1, 0.75, 0.75]); # Ratio of arrival rate
-        target_prob_blockage = np.array([0.1, 0.1, 0.05, 0.75, 0.75]); # Average percentage of slots in blockage
+        radius = np.array([15, 15, 25, 30, 30]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
+        lambda_ratio = np.array([1, 1, 3, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.05, 0.75, 0.75]); # Average percentage of slots in blockage
+        target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 3: 
         N_UE = 5; # Number of users 
-        radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
-        angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
-        lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage = np.array([0.2, 0.2, 0.2, 0.2, 0.2]); # Average percentage of slots in blockage
+        radius = np.array([15, 15, 25, 30, 30]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
+        lambda_ratio = np.array([1, 1, 3, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.2, 0.2, 0.2, 0.2, 0.2]); # Average percentage of slots in blockage
+        target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 4: 
         N_UE = 5; # Number of users 
-        radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
-        angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
-        lambda_ratio = np.array([1.5, 1, 1, 0.75, 0.75]); # Ratio of arrival rate
-        target_prob_blockage = np.array([0.2, 0.2, 0.2, 0.2, 0.2]); # Average percentage of slots in blockage
+        radius = np.array([15, 15, 25, 30, 30]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
+        lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.2, 0.2, 0.2, 0.2, 0.2]); # Average percentage of slots in blockage
+        target_prob_blockage_D2D = 0.05
+    target_prob_blockage = np.ones((N_UE,N_UE)) - np.diag(np.ones(N_UE))
+    target_prob_blockage = target_prob_blockage * target_prob_blockage_D2D + np.diag(target_prob_blockage_to_AP)
     Xcoor_init, Ycoor_init = pol2cart(np.deg2rad(angle),radius);
-
+    Xcoor_init = np.append(Xcoor_init,0) # Last index for AP X
+    Ycoor_init = np.append(Ycoor_init,0) # Last index for AP Y
 
     # -----------------------------------------------
     # Beam training setting (realignment periodicity)
@@ -75,14 +82,14 @@ def env_init(Netw_topo_id):
     max_activity_range = 5; # maximum distance in meters from the initial position
     v_min = 0;  # minimum speed in m/s
     v_max = 10; # maximum speed in m/s
-    last_direction = np.zeros(N_UE)
-    last_velocity = np.zeros(N_UE)
-    number_last_direction = np.zeros(N_UE)
+    last_direction = np.zeros(N_UE+1) # last index is for the mobility of AP
+    last_velocity = np.zeros(N_UE+1) # last index is for the mobility of AP
+    number_last_direction = np.zeros(N_UE+1) # last index is for the mobility of AP
     v_self_rotate_min = 0  # minimum ratation speed in degrees/s
     v_self_rotate_max = 5  # maximum ratation speed in degrees/s
-    number_last_rotate = np.zeros(N_UE)
-    max_number_last_rotate = 2
-    max_number_last_direction = 2
+    number_last_rotate = np.zeros(N_UE+1) # last index is for the mobility of AP
+    max_number_last_rotate = 5
+    max_number_last_direction = 5
     
     
     # -------------------------------------
@@ -95,7 +102,6 @@ def env_init(Netw_topo_id):
     max_blockage_duration_guess = 10;  # Guess of max_blockage_duration
     prob_blockage = target_prob_blockage/\
     (target_prob_blockage+(min_blockage_duration+max_blockage_duration)/2*(1-target_prob_blockage))  
-    
 
     # -------------------------------------
     # UE packet arrival model
@@ -262,9 +268,9 @@ def env_init(Netw_topo_id):
     env_parameter.radius = radius
     env_parameter.Xcoor_init = Xcoor_init;
     env_parameter.Ycoor_init = Ycoor_init;
-    env_parameter.Xcoor_list = [list() for _ in range(env_parameter.N_UE)]
-    env_parameter.Ycoor_list = [list() for _ in range(env_parameter.N_UE)]
-    for u in range(env_parameter.N_UE):
+    env_parameter.Xcoor_list = [list() for _ in range(len(Xcoor_init))]
+    env_parameter.Ycoor_list = [list() for _ in range(len(Xcoor_init))]
+    for u in range(len(Xcoor_init)):
         env_parameter.Xcoor_list[u].append(Xcoor_init[u]);
         env_parameter.Ycoor_list[u].append(Ycoor_init[u]);
     env_parameter.Xcoor = Xcoor_init;
@@ -312,7 +318,7 @@ class envs():
         # Following would be reset when reset() called
         self.ct = 0
         self.Reff_BS2UE_Link_Last_Slot = 0
-        self.remain_slots_in_blockage = np.zeros(env_parameter.N_UE,dtype=int)
+        self.remain_slots_in_blockage = np.zeros((env_parameter.N_UE,env_parameter.N_UE),dtype=int)
         self.num_slots_to_last_blockage_starts = np.ones(env_parameter.N_UE,dtype=int) * 100
         self.pathloss_history = np.zeros((slots_monitored,env_parameter.N_UE,env_parameter.N_UE))
         self.outage_coeff = np.zeros((env_parameter.N_UE,env_parameter.N_UE))
@@ -335,7 +341,7 @@ class envs():
     def reset(self):
         self.ct = 0
         self.Reff_BS2UE_Link_Last_Slot = 0
-        self.remain_slots_in_blockage = np.zeros(self.env_parameter.N_UE,dtype=int)
+        self.remain_slots_in_blockage = np.zeros((self.env_parameter.N_UE,self.env_parameter.N_UE),dtype=int)
         self.num_slots_to_last_blockage_starts = np.ones(self.env_parameter.N_UE,dtype=int) * 100
         self.pathloss_history = np.zeros((self.slots_monitored,self.env_parameter.N_UE,self.env_parameter.N_UE))
         self.outage_coeff = np.zeros((self.env_parameter.N_UE,self.env_parameter.N_UE))
@@ -549,14 +555,14 @@ class envs():
         if self.ct == 0:
             self.env_parameter.Xcoor = self.env_parameter.Xcoor_init;
             self.env_parameter.Ycoor = self.env_parameter.Ycoor_init;
-            self.env_parameter.Xcoor_list = [list() for _ in range(self.env_parameter.N_UE)]
-            self.env_parameter.Ycoor_list = [list() for _ in range(self.env_parameter.N_UE)]
-            for u in range(self.env_parameter.N_UE):
+            self.env_parameter.Xcoor_list = [list() for _ in range(self.env_parameter.N_UE+1)]
+            self.env_parameter.Ycoor_list = [list() for _ in range(self.env_parameter.N_UE+1)]
+            for u in range(self.env_parameter.N_UE+1):
                 self.env_parameter.Xcoor_list[u].append(self.env_parameter.Xcoor_init[u]);
                 self.env_parameter.Ycoor_list[u].append(self.env_parameter.Ycoor_init[u]);
-            self.env_parameter.number_last_direction = np.zeros(self.env_parameter.N_UE)
-            self.env_parameter.direction_new = np.zeros(self.env_parameter.N_UE)
-            self.env_parameter.velocity_new = np.zeros(self.env_parameter.N_UE)
+            self.env_parameter.number_last_direction = np.zeros(self.env_parameter.N_UE+1)
+            self.env_parameter.direction_new = np.zeros(self.env_parameter.N_UE+1)
+            self.env_parameter.velocity_new = np.zeros(self.env_parameter.N_UE+1)
         else:
             # Fetch initial position
             Xcoor_init = self.env_parameter.Xcoor_init
@@ -565,14 +571,14 @@ class envs():
             Xcoor = self.env_parameter.Xcoor
             Ycoor = self.env_parameter.Ycoor
             # Compute the new position
-            Xcoor_new = np.zeros(self.env_parameter.N_UE)
-            Ycoor_new = np.zeros(self.env_parameter.N_UE)
-            # Current distance to UE
+            Xcoor_new = np.zeros(self.env_parameter.N_UE+1)
+            Ycoor_new = np.zeros(self.env_parameter.N_UE+1)
+            # Current distance to the initial position
             current_dist_to_original = np.sqrt((Xcoor-Xcoor_init)**2 + (Ycoor-Ycoor_init)**2)  
-            new_dist_to_original = np.zeros(self.env_parameter.N_UE)
-            direction_new = np.zeros(self.env_parameter.N_UE)
-            velocity_new = np.zeros(self.env_parameter.N_UE)
-            for u in range(self.env_parameter.N_UE):
+            new_dist_to_original = np.zeros(self.env_parameter.N_UE+1)
+            direction_new = np.zeros(self.env_parameter.N_UE+1)
+            velocity_new = np.zeros(self.env_parameter.N_UE+1)
+            for u in range(self.env_parameter.N_UE+1):
                 # Case UE is currently on border
                 if abs(current_dist_to_original[u]-self.env_parameter.max_activity_range) <= 1e-6:
                     # Bouncing back to the original position
@@ -590,7 +596,7 @@ class envs():
                         direction_new[u] = self.env_parameter.last_direction[u]
                         velocity_new[u] = self.env_parameter.last_velocity[u]
                         self.env_parameter.number_last_direction[u] += 1
-                        #print('Continue direction')
+                        #print('Continue the previous direction')
                 self.env_parameter.last_direction[u] = direction_new[u]
                 self.env_parameter.last_velocity[u] = velocity_new[u]
                 Xcoor_new[u] = Xcoor[u] + np.cos(direction_new[u]) * velocity_new[u] * self.env_parameter.t_slot
@@ -624,7 +630,8 @@ class envs():
         # Compute new distance
         dist_D2D = np.ones((self.env_parameter.N_UE,self.env_parameter.N_UE));
         for u1 in range(self.env_parameter.N_UE):
-            dist_D2D[u1,u1] = np.sqrt((self.env_parameter.Xcoor[u1])**2 + (self.env_parameter.Ycoor[u1])**2);
+            dist_D2D[u1,u1] = np.sqrt((self.env_parameter.Xcoor[u1]-self.env_parameter.Xcoor[-1])**2 +\
+                                      (self.env_parameter.Ycoor[u1]-self.env_parameter.Ycoor[-1])**2);
             for u2 in range(u1+1,self.env_parameter.N_UE,1):
                 dist_D2D[u1,u2] = np.sqrt((self.env_parameter.Xcoor[u1]-self.env_parameter.Xcoor[u2])**2 +\
                                           (self.env_parameter.Ycoor[u1]-self.env_parameter.Ycoor[u2])**2);
@@ -635,20 +642,27 @@ class envs():
             self.env_parameter.Pathloss = Pathloss
         else:
             new_blockage_duration = \
-            np.random.randint(self.env_parameter.min_blockage_duration,self.env_parameter.max_blockage_duration+1,1)[0]
-            new_blockage_status = np.random.binomial(1,self.env_parameter.prob_blockage)
+            np.random.randint(self.env_parameter.min_blockage_duration,self.env_parameter.max_blockage_duration+1,\
+                             (self.env_parameter.N_UE,self.env_parameter.N_UE))
+            new_blockage_status = np.random.binomial(1,self.env_parameter.prob_blockage) 
+            for uu1 in range(self.env_parameter.N_UE):
+                for uu2 in range(uu1+1,self.env_parameter.N_UE):
+                    new_blockage_duration[uu2,uu1] = new_blockage_duration[uu1,uu2];
+                    new_blockage_status[uu2,uu1] = new_blockage_status[uu1,uu2];
+                    
             self.remain_slots_in_blockage -= 1;
-            self.remain_slots_in_blockage[np.where(self.remain_slots_in_blockage<0)[0]] = 0
+            self.remain_slots_in_blockage.clip(min=0,out=self.remain_slots_in_blockage)            
             is_in_blockage = np.zeros_like(self.remain_slots_in_blockage)
-            is_in_blockage[np.where(self.remain_slots_in_blockage>=1)[0]] = 1
+            is_in_blockage.clip(max=1,out=is_in_blockage)           
             self.remain_slots_in_blockage = self.remain_slots_in_blockage + \
             (1 - is_in_blockage) * new_blockage_duration * new_blockage_status
             is_in_blockage = np.zeros_like(self.remain_slots_in_blockage)
-            is_in_blockage[np.where(self.remain_slots_in_blockage>=1)[0]] = 1
+            self.remain_slots_in_blockage.clip(max=1,out=is_in_blockage)               
             blockage_loss_dB = is_in_blockage * self.env_parameter.blockage_loss_dB
-            Pathloss = 28.0 + 22*np.log10(dist_D2D) + 20*np.log10(self.env_parameter.fc) + np.diag(blockage_loss_dB); 
+            Pathloss = 28.0 + 22*np.log10(dist_D2D) + 20*np.log10(self.env_parameter.fc) + blockage_loss_dB; 
             self.env_parameter.Pathloss = Pathloss
-            self.num_slots_to_last_blockage_starts = self.num_slots_to_last_blockage_starts * (1-new_blockage_status)
+            self.num_slots_to_last_blockage_starts = self.num_slots_to_last_blockage_starts * \
+            (1-np.diag(new_blockage_status))
         
         # Save path loss history
         self.pathloss_history[self.ct,:,:] = Pathloss
@@ -685,12 +699,12 @@ class envs():
             if l == 0: 
                 uTx = action.Relay_ID
                 uRx = action.Relay_ID
-                v_tmp_Tx = 0
-                Xcoor_Tx_last = 0
-                Ycoor_Tx_last = 0
-                Xcoor_Tx_evo = np.zeros_like(t_seg_vec)
-                Ycoor_Tx_evo = np.zeros_like(t_seg_vec)
-                theta_Tx_self_rotate = np.zeros_like(t_seg_vec)
+                v_tmp_Tx = v_tmp[-1]
+                Xcoor_Tx_last = self.env_parameter.Xcoor_list[-1][-2]
+                Ycoor_Tx_last = self.env_parameter.Ycoor_list[-1][-2]
+                Xcoor_Tx_evo = Xcoor_Tx_last + np.cos(direction_new[-1]) * v_tmp_Tx * t_seg_vec
+                Ycoor_Tx_evo = Ycoor_Tx_last + np.sin(direction_new[-1]) * v_tmp_Tx * t_seg_vec
+                theta_Tx_self_rotate = v_self_rotate[-1] * t_seg_vec
                 theta_Rx_self_rotate = v_self_rotate[uRx] * t_seg_vec
             elif  l == 1 and state.Is_D2D_Link_Active:
                 uTx = state.Tx_ID_D2D_Link
@@ -791,13 +805,13 @@ class envs():
         if Is_D2D_Link_Active:
             X_D2D = channel[Tx_ID_D2D_Link,Rx_ID_D2D_Link];
 
-        # Update the UE position (Mobility model)
+        # Update the UE position (Mobility modeling)
         self.position_update()
         
-        # Update the pathloss (Blockage model)
+        # Update the pathloss (Blockage modeling)
         self.pathloss_update()
         
-        # Update outage event
+        # Update outage event (Outage modeling)
         self.outage_coeff_update(state, action)
         
         # Beam training and data transmission for main link
