@@ -22,10 +22,12 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
              batches, slots, iterations, \
              gamma, lambd, value_coeff, entropy_coeff, \
              clip_param, decaying_clip_param, clipping_critic,\
-             eval_loops, eval_ites, device):
+             eval_loops, eval_ites, device, clip_queues):
     
     # Init
-    all_rewards = []
+    evolution_reward_evaluated = []
+    evolution_reward = []
+    evolution_queue_length = []
     num_batch = np.ceil(slots/batches)
     if decaying_clip_param:
         clip_param_decay_amount = 1/(iterations*slots/batches)
@@ -49,18 +51,23 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
         Vvals = []           # List of predicted value function in a batch (by default a batch is an episode)
         rewards = []         # List of reward in a batch (by default a batch is an episode)
         rewards_episode = [] # List of reward in a batch (by default a batch is an episode)
-        state = env.reset()  # Initial state for an epiosde
+        if ite == 0:
+            state = env.reset()  # Initial state for an epiosde
+        else:
+            if clip_queues:
+                state = env.reset()
+            else:
+                env.reset()
+                env.npkts_arrival = last_state.Queue_length
+                env.npkts_arrival_evolution[env.ct,:] = env.npkts_arrival
+                env.Queue[env.ct,:] = env.npkts_arrival
+                env.current_Queue_dist_by_delay[1,:] = env.npkts_arrival # Initial packets have delay of 1 slot
+                state = last_state                
         
         # Loop time slots (steps) within one episodes
         # Timer starts
         t1 = time.time()
         for slot in range(slots):   
-            
-            # Save last action/state for debug (deepcopy is time consuming)
-            #try: 
-            #    last_action = copy.deepcopy(action)
-            #    last_state = copy.deepcopy(state)
-            #except: pass
 
             # Using actor-critic NNs to predict the value function Vval and a policy pi
             input_state = state.to_ndarray_normalized()
@@ -79,19 +86,23 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             
             # Interaction with the enviroment to get a new state and a step-level reward   
             state, output, reward, done = env.step(state, action, env.channel_realization())
-            #last_state= copy.deepcopy(state)
             
             # Cumulate the reward, value function and ratio
             rewards_episode.append(reward)
             rewards.append(reward)
             Vvals.append(Vval)
             ratios.append(ratio)
+            
+            # Save the last state of the current iteration (deepcopy is time consuming)
+            if slot == slots-1 :
+                last_state = copy.deepcopy(state)
+                #last_action = copy.deepcopy(action)
+            # Save queue length
+            evolution_queue_length.append(np.mean(state.Queue_length))
+            evolution_reward.append(reward)
                 
             #------------------ Update policy with batch of samples or at the end of the episode ------------------#
-            if done or ((slot+1) % batches == 0):
-                
-                # Save cumulative reward of a batch 
-                if done: all_rewards.append(np.sum(rewards_episode))  
+            if done or ((slot+1) % batches == 0): 
                 
                 # Compute actor and predict next value function with actor-critic NN
                 input_state = state.to_ndarray_normalized()
@@ -119,7 +130,6 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
                     Advs = (advantages - advantages.mean()) / (advantages.std() + 1e-8)
                 else:
                     Advs = advantages
-                
                 
                 #------------------------------------
                 # Calculate loss
@@ -156,7 +166,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
                 # Prints results
                 if done:
                     time_per_ite = time.time() - t1
-                    sys.stdout.write("Ite: {:0>4d}, A_loss: {:+.10f}, C_loss: {:+.5f}, E_loss: {:+.5f}, Ave queue: {:.2f}, Ave reward: {:.3f}, Time: {:.3f}\n".format(ite, actor_loss, critic_loss, entropy_loss, np.mean(state.Queue_length), np.mean(rewards_episode), time_per_ite))
+                    sys.stdout.write("Ite: {:0>4d}, A_loss: {:+.10f}, C_loss: {:+.5f}, E_loss: {:+.5f}, Ave final queue: {:.2f}, Ave reward: {:.3f}, Time: {:.3f}\n".format(ite, actor_loss, critic_loss, entropy_loss, np.mean(state.Queue_length), np.mean(rewards_episode), time_per_ite))
                     t1 = time.time()
                 
                 # Clear up the following lists
@@ -190,6 +200,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             sys.stdout.write("\n----------------------------------------\n")
             sys.stdout.write("Evaluation ends\n")
             sys.stdout.write("----------------------------------------\n")
+            evolution_reward_evaluated.append(Ave_npkts_dep_per_slot)
          
         # Code Profiler
         if profiling_code and ite == 0:
@@ -205,7 +216,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             print(s.getvalue())
     
     # Return results
-    return all_rewards, Queue_Eval, Delay_dist_Eval, actor_critic_net
+    return evolution_reward_evaluated, evolution_queue_length, evolution_reward, Queue_Eval, Delay_dist_Eval, actor_critic_net
 
 
 
