@@ -45,6 +45,8 @@ def main():
     parser.add_argument('--batches', default=20, type=int, help='number of slots in a single batch')
     parser.add_argument('--eval_loops', default=5, type=int, help='number of evaluations for a checkpoint')
     parser.add_argument('--eval_ites', default=10, type=int, help='number of iterations before each ckpt evaluation')
+    parser.add_argument('--clip_queues', default=0, type=int, help='clip the queue at the end of each iteration')
+    
     # Learning part
     parser.add_argument('--lr', default=0.001, type=float, help='actor/critic learning rate')
     parser.add_argument('--lr_decay_rate', default=0.9, type=float, help='decaying rate of learning rate')
@@ -88,19 +90,26 @@ def main():
         os.makedirs(output_folder)
     
     #-----------------------------------------------------------
+    # Comment argument
+    #-----------------------------------------------------------
+    Netw_topo_id = args.Netw_topo_id
+    slots = args.slots
+    
+    #-----------------------------------------------------------
     #Training
     #-----------------------------------------------------------
     if args.training:
         # Create an instance of enviroment and print key system parameters
-        slots = args.slots
-        Netw_topo_id = args.Netw_topo_id
         env_parameter = env_init(Netw_topo_id)
         env = envs(env_parameter,slots)
         print('Training with ' + device_name)
         print('Time slot duration is %f seconds' %env_parameter.t_slot)
+        total_running_time = env_parameter.t_slot * args.iterations * args.slots / 3600
+        print('Total running time is %f hours' %total_running_time)
         print('Maximum activity range is %d meters' %env_parameter.max_activity_range)
-        print('Probabbility of blockage is:', env_parameter.target_prob_blockage)
-
+        print('Average time in blockage is \r\n', env_parameter.target_prob_blockage)
+        print('Probabbility of blockage is \r\n', env_parameter.prob_blockage)
+        
         # Create learning framwork and optimizer, i.e. an actor_critic network
         a_hid_dim = args.a_hid_dim; 
         c_hid_dim = args.c_hid_dim; 
@@ -121,16 +130,18 @@ def main():
         eval_ites = args.eval_ites
         decaying_clip_param = args.decaying_clip_param
         clipping_critic = args.clipping_critic
+        clip_queues = args.clip_queues
         
         # Training
         print('\n------------------------------------------------------')
         print('Starting Training')
         print('-------------------------------------------------------')
-        all_rewards, Queue_Eval, Delay_dist_Eval, actor_critic_net = \
+        evolution_reward_evaluated, evolution_queue_length, evolution_reward, \
+        Queue_Eval, Delay_dist_Eval, actor_critic_net = \
         training(env, actor_critic_net, optimizer, scheduler, batches, slots, iterations,\
                  gamma, lambd, value_coeff, entropy_coeff,\
                  clip_param, decaying_clip_param, clipping_critic,\
-                 eval_loops, eval_ites, device)
+                 eval_loops, eval_ites, device, clip_queues)
         
         # Save the trained model result
         trained_model_filename = output_folder+'trained_model_netwTopo'+str(Netw_topo_id)+'.pt'
@@ -145,7 +156,9 @@ def main():
             'args': args,
             'env_parameter': env_parameter,
             'device_name': device_name,
-            'all_rewards': all_rewards,
+            'evolution_reward_evaluated': evolution_reward_evaluated,
+            'evolution_queue_length': evolution_queue_length,
+            'evolution_reward': evolution_reward,
             'Queue_Eval': Queue_Eval,
             'Delay_dist_Eval': Delay_dist_Eval,
             'model': actor_critic_net,
@@ -156,7 +169,8 @@ def main():
         outfile.close()
         
         # Plot last evaluation result
-        plot_last_evaluation_result(all_rewards, Queue_Eval, Delay_dist_Eval, slots, Netw_topo_id, output_folder)
+        plot_last_evaluation_result(args.eval_ites, evolution_reward_evaluated, evolution_queue_length, evolution_reward,\
+                                    Queue_Eval, Delay_dist_Eval, slots, Netw_topo_id, output_folder)
 
     
     #-----------------------------------------------------------
@@ -181,7 +195,13 @@ def main():
         DRL_Decision_Maker.eval()
         
         # Plot trained results
-        plot_last_evaluation_result(all_rewards, Queue_Eval, Delay_dist_Eval, slots, Netw_topo_id, output_folder)
+        evolution_reward_evaluated = training_results_dict['evolution_reward_evaluated']
+        evolution_queue_length = training_results_dict['evolution_queue_length']
+        evolution_reward = training_results_dict['evolution_reward']
+        Queue_Eval = training_results_dict['Queue_Eval']
+        Delay_dist_Eval = training_results_dict['Delay_dist_Eval']
+        plot_last_evaluation_result(args.eval_ites, evolution_reward_evaluated, evolution_queue_length, evolution_reward,\
+                                    Queue_Eval, Delay_dist_Eval, slots, Netw_topo_id, output_folder)
         pass
 
 
