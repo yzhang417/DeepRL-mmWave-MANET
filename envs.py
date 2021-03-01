@@ -334,6 +334,7 @@ class envs():
         self.external_npkts_arrival = np.zeros((env_parameter.N_UE),dtype=int)
         self.current_Queue_dist_by_delay = np.zeros((slots_monitored+1,env_parameter.N_UE),dtype=int)
         self.delay_dist = np.zeros((slots_monitored+1,env_parameter.N_UE),dtype=int)
+        self.is_in_blockage = np.zeros((env_parameter.N_UE,env_parameter.N_UE),dtype=int)
 
     # -------------------------------------    
     # Reset enviroment
@@ -357,6 +358,7 @@ class envs():
         self.external_npkts_arrival = np.zeros((self.env_parameter.N_UE),dtype=int)
         self.current_Queue_dist_by_delay = np.zeros((self.slots_monitored+1,self.env_parameter.N_UE),dtype=int)
         self.delay_dist = np.zeros((self.slots_monitored+1,self.env_parameter.N_UE),dtype=int)
+        self.is_in_blockage = np.zeros((self.env_parameter.N_UE,self.env_parameter.N_UE),dtype=int)
         # Above is the similar to as __init__
         if self.is_external_packet_arrival_process:
             self.npkts_arrival = self.external_npkts_arrival
@@ -657,7 +659,8 @@ class envs():
             self.remain_slots_in_blockage = self.remain_slots_in_blockage + \
             (1 - is_in_blockage) * new_blockage_duration * new_blockage_status
             is_in_blockage = np.zeros_like(self.remain_slots_in_blockage)
-            self.remain_slots_in_blockage.clip(max=1,out=is_in_blockage)               
+            self.remain_slots_in_blockage.clip(max=1,out=is_in_blockage)     
+            self.is_in_blockage = is_in_blockage
             blockage_loss_dB = is_in_blockage * self.env_parameter.blockage_loss_dB
             Pathloss = 28.0 + 22*np.log10(dist_D2D) + 20*np.log10(self.env_parameter.fc) + blockage_loss_dB; 
             self.env_parameter.Pathloss = Pathloss
