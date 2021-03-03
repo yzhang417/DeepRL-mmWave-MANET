@@ -45,6 +45,7 @@ class def_state():
         est_depart = self.est_depart;     
         Queue_length = self.Queue_length;
         prob_still_in_blockage = self.prob_still_in_blockage;
+        #prob_still_in_blockage = np.zeros_like(self.prob_still_in_blockage)
         #state_ndarray = np.concatenate([Is_D2D_Link_Active, Is_Tracking, est_arrival, est_depart, Queue_length])
         state_ndarray = np.concatenate([Is_D2D_Link_Active, Is_Tracking, Queue_length, prob_still_in_blockage])
         return state_ndarray

@@ -40,9 +40,9 @@ def main():
     parser.add_argument('--output', default=None, help='output folder of training results')
     
     # Training process
-    parser.add_argument('--iterations', default=500, type=int, help='number of episodes')
-    parser.add_argument('--slots', default=2000, type=int, help='number of slots in a single episode')
-    parser.add_argument('--batches', default=20, type=int, help='number of slots in a single batch')
+    parser.add_argument('--iterations', default=600, type=int, help='number of episodes')
+    parser.add_argument('--slots', default=1500, type=int, help='number of slots in a single episode')
+    parser.add_argument('--batches', default=5, type=int, help='number of slots in a single batch')
     parser.add_argument('--eval_loops', default=5, type=int, help='number of evaluations for a checkpoint')
     parser.add_argument('--eval_ites', default=10, type=int, help='number of iterations before each ckpt evaluation')
     parser.add_argument('--clip_queues', default=0, type=int, help='clip the queue at the end of each iteration')
@@ -137,7 +137,7 @@ def main():
         print('Starting Training')
         print('-------------------------------------------------------')
         evolution_reward_evaluated, evolution_queue_length, evolution_reward, \
-        Queue_Eval, Delay_dist_Eval, actor_critic_net = \
+        Queue_Eval, Delay_dist_Eval, evolution_ratio_under_blockage, evolution_ave_delay, actor_critic_net = \
         training(env, actor_critic_net, optimizer, scheduler, batches, slots, iterations,\
                  gamma, lambd, value_coeff, entropy_coeff,\
                  clip_param, decaying_clip_param, clipping_critic,\
@@ -161,6 +161,8 @@ def main():
             'evolution_reward': evolution_reward,
             'Queue_Eval': Queue_Eval,
             'Delay_dist_Eval': Delay_dist_Eval,
+            'evolution_ratio_under_blockage': evolution_ratio_under_blockage,
+            'evolution_ave_delay': evolution_ave_delay,
             'model': actor_critic_net,
             'model_state_dict': actor_critic_net.state_dict()
         }
@@ -170,7 +172,8 @@ def main():
         
         # Plot last evaluation result
         plot_last_evaluation_result(args.eval_ites, evolution_reward_evaluated, evolution_queue_length, evolution_reward,\
-                                    Queue_Eval, Delay_dist_Eval, slots, Netw_topo_id, output_folder)
+                                    Queue_Eval, Delay_dist_Eval, evolution_ratio_under_blockage, evolution_ave_delay,\
+                                    slots, Netw_topo_id, output_folder)
 
     
     #-----------------------------------------------------------
@@ -196,12 +199,15 @@ def main():
         
         # Plot trained results
         evolution_reward_evaluated = training_results_dict['evolution_reward_evaluated']
+        evolution_ratio_under_blockage = training_results_dict['evolution_ratio_under_blockage']
+        evolution_ave_delay = training_results_dict['evolution_ave_delay']
         evolution_queue_length = training_results_dict['evolution_queue_length']
         evolution_reward = training_results_dict['evolution_reward']
         Queue_Eval = training_results_dict['Queue_Eval']
         Delay_dist_Eval = training_results_dict['Delay_dist_Eval']
         plot_last_evaluation_result(args.eval_ites, evolution_reward_evaluated, evolution_queue_length, evolution_reward,\
-                                    Queue_Eval, Delay_dist_Eval, slots, Netw_topo_id, output_folder)
+                                    Queue_Eval, Delay_dist_Eval, evolution_ratio_under_blockage, evolution_ave_delay,\
+                                    slots, Netw_topo_id, output_folder)
         pass
 
 

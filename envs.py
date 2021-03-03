@@ -86,7 +86,7 @@ def env_init(Netw_topo_id):
     last_velocity = np.zeros(N_UE+1) # last index is for the mobility of AP
     number_last_direction = np.zeros(N_UE+1) # last index is for the mobility of AP
     v_self_rotate_min = 0  # minimum ratation speed in degrees/s
-    v_self_rotate_max = 5  # maximum ratation speed in degrees/s
+    v_self_rotate_max = 10  # maximum ratation speed in degrees/s
     number_last_rotate = np.zeros(N_UE+1) # last index is for the mobility of AP
     max_number_last_rotate = 5
     max_number_last_direction = 5
@@ -116,8 +116,8 @@ def env_init(Netw_topo_id):
     # -------------------------------------
     # Channel correlation and fading model
     # -------------------------------------
-    channel_corr_coeff = np.array([0.8,0.2]); # Channel time correlation
-    #channel_corr_coeff = np.array([1]);
+    #channel_corr_coeff = np.array([0.8,0.2]); # Channel time correlation
+    channel_corr_coeff = np.array([1]);
     mean_X_coeff = 0;
     sigma_X_coeff = np.sqrt(2);
     mean_X = mean_X_coeff*np.zeros((N_UE,N_UE));
@@ -148,7 +148,7 @@ def env_init(Netw_topo_id):
     Pn_dBm = -174 + 10*np.log10(B) + 10;   # Power of noise in dBm
     SNR_Value = RS_Value - Pn_dBm;         # Corresponding SNR table to RSS
 
-    
+
     # -------------------------------------
     # Antenna setting at BS and UE
     # -------------------------------------
@@ -874,3 +874,24 @@ class envs():
 
         # Return object
         return output
+    
+    # -------------------------------------
+    # Calculate the delay distribution
+    # This function is called after the step function, 
+    # namely that the newly arrived packets are included
+    # -------------------------------------
+    def get_delay_distribution(self):        
+        # Sanitity check of number of packets
+        total_num_npkts_arrived_per_ue = np.squeeze(np.sum(self.npkts_arrival_evolution,axis=0))
+        total_num_npkts_sent_per_ue = np.squeeze(np.sum(self.delay_dist,axis=0))
+        total_num_npkts_queued_per_ue = np.squeeze(self.Queue[self.ct,:])
+        
+        # Maximum delay
+        num_extra_episodes = np.ceil(total_num_npkts_queued_per_ue/total_num_npkts_sent_per_ue);
+        est_max_delay = (np.max(num_extra_episodes) + 1) * self.slots_monitored
+        
+        # Estimated average delay (including delay occured by emptying the queues)
+        est_delay_distribution = np.zeros_like(self.delay_dist)
+        est_delay_distribution = self.delay_dist + self.current_Queue_dist_by_delay
+        
+        return est_delay_distribution

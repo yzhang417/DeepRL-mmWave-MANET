@@ -33,20 +33,27 @@ def cdf_dist_P_vs_b(queue_length,n_linspace):
 # Plot network topology
 #-------------------------------------------------------------------------
 def plot_network_topology(env_parameter, output_folder, show_mobility_trace):
+    plt.rcParams.update({'font.size': 16})
+    plt.rcParams.update({'axes.labelsize': 16})
+    plt.rcParams.update({'legend.fontsize': 12})
+    plt.rcParams.update({'legend.fontsize': 12})
+    plt.rcParams.update({'legend.loc': 'lower right'})
+    plt.rcParams.update({'figure.autolayout': True})
+    plt.rcParams['lines.linewidth'] = 1.5
     ue_color = ['b','g','c','m','k','r']
     number_dots_border = range(360);
     Xcoor_border = env_parameter.max_activity_range * np.cos(np.radians(number_dots_border))
     Ycoor_border = env_parameter.max_activity_range * np.sin(np.radians(number_dots_border))            
-    fig = plt.figure(figsize=(8,4),dpi=100);   
+    fig = plt.figure(figsize=(10,5),dpi=1200);   
     ax_netw_topo = fig.add_subplot(111)
     ax_netw_topo.axis('equal')
     ax_netw_topo.grid(b=True, which='major', color='#666666', linestyle='-')
     for u in range(env_parameter.N_UE):
         ax_netw_topo.plot(env_parameter.Xcoor_init[u],env_parameter.Ycoor_init[u],\
-                          '*', label='Mobile UE '+str(u),c=ue_color[u])
+                          '*', label='UE '+str(u),c=ue_color[u])
         ax_netw_topo.plot(env_parameter.Xcoor_init[u] + Xcoor_border,\
                           env_parameter.Ycoor_init[u] + Ycoor_border,\
-                          '-', label='Border of Mobile UE '+str(u),c=ue_color[u])
+                          '-', label='Border of UE '+str(u),c=ue_color[u])
     #ax_netw_topo.plot(0,0,'s',label='AP',c='r');  
     ax_netw_topo.plot(env_parameter.Xcoor_init[-1],env_parameter.Ycoor_init[-1],\
                       's',label='AP',c=ue_color[-1])
@@ -60,12 +67,12 @@ def plot_network_topology(env_parameter, output_folder, show_mobility_trace):
     if show_mobility_trace:
         for u in range(env_parameter.N_UE+1):
             ax_netw_topo.plot(env_parameter.Xcoor_list[u],env_parameter.Ycoor_list[u],'-',\
-                              c=ue_color[u],linewidth=0.2, markersize=0.1)
-        plt.savefig(output_folder+'Network_topology'+str(env_parameter.Netw_topo_id)+'.png',\
-                    format='png', facecolor='w', transparent=False)
+                              c=ue_color[u],linewidth=0.3, markersize=0.15)
+        plt.savefig(output_folder+'Network_topology_one_realization'+str(env_parameter.Netw_topo_id)+'.eps',\
+                    format='eps', facecolor='w', transparent=False, dpi=1200)
     else:
-        plt.savefig(output_folder+'Network_topology_one_realization'+str(env_parameter.Netw_topo_id)+'.png',\
-                    format='png', facecolor='w', transparent=False)
+        plt.savefig(output_folder+'Network_topology'+str(env_parameter.Netw_topo_id)+'.eps',\
+                    format='eps', facecolor='w', transparent=False, dpi=1200)
     plt.show()
     
 
@@ -73,73 +80,108 @@ def plot_network_topology(env_parameter, output_folder, show_mobility_trace):
 # Plot last evaluation result
 #-------------------------------------------------------------------------
 def plot_last_evaluation_result(eval_ites, evolution_reward_evaluated, evolution_queue_length, evolution_reward,\
-                                Queue_Eval, Delay_dist_Eval, slots, Netw_topo_id, output_folder):
+                                Queue_Eval, Delay_dist_Eval, evolution_ratio_under_blockage, evolution_ave_delay,\
+                                slots, Netw_topo_id, output_folder):
     plt.rcParams.update({'font.size': 16})
-    plt.rcParams.update({'axes.labelsize': 18})
+    plt.rcParams.update({'axes.labelsize': 16})
     plt.rcParams.update({'legend.fontsize': 12})
     plt.rcParams.update({'legend.fontsize': 12})
     plt.rcParams.update({'legend.loc': 'lower right'})
+    plt.rcParams.update({'figure.autolayout': True})
+    plt.rcParams['lines.linewidth'] = 2.5
     
+    #----------------------------------------------------------------
+    # Results from overall training process
+    #----------------------------------------------------------------
+    # Queue length during the whole training time
     figID = 2
-    plt.figure(num=figID,figsize=(12,7),dpi=100)
+    plt.figure(num=figID,figsize=(12,7),dpi=1200)
     plt.title('Evolution of queue length during the whole training process');
     plt.plot(range(len(evolution_queue_length)),evolution_queue_length);
     plt.xlabel('Time slot ID');
     plt.ylabel('Average queue length');
-    plt.savefig(output_folder+'Evolution_queue_length_whole_process.png',format='png', facecolor='w', transparent=False)
+    plt.savefig(output_folder+'Evolution_queue_length_whole_process.eps',format='eps', facecolor='w', transparent=False)
     
+    # Step-wise reward at each check point
     figID += 1
-    plt.figure(num=figID,figsize=(12,7),dpi=100)
-    plt.title('Training evolution evaluated at each checkpoint');
+    plt.figure(num=figID,figsize=(12,7),dpi=1200)
+    plt.title('Evolution of step-wise reward evaluated at each checkpoint');
     plt.plot(range(1*eval_ites,len(evolution_reward_evaluated)*eval_ites+1,eval_ites),evolution_reward_evaluated);
-    plt.xlabel('Training iteration');
-    plt.ylabel('Rewards');
-    plt.savefig(output_folder+'Average_training_evolution.png',format='png', facecolor='w', transparent=False)
+    plt.xlabel('Training iteration (one iteration is one minute)');
+    plt.ylabel('Reward');
+    plt.savefig(output_folder+'Average_training_evolution.eps',format='eps', facecolor='w', transparent=False)
     
+    # Average delay at each check point
     figID += 1
-    ave_slots = 1500
+    plt.figure(num=figID,figsize=(12,7),dpi=1200)
+    plt.title('Evolution of average delay evaluated at each checkpoint');
+    plt.plot(range(1*eval_ites,len(evolution_ave_delay)*eval_ites+1,eval_ites),evolution_ave_delay);
+    plt.xlabel('Training iteration (one iteration is one minute)');
+    plt.ylabel('Average delay in slots');
+    plt.savefig(output_folder+'Average_delay_evolution.eps',format='eps', facecolor='w', transparent=False)
+    
+    # Blockage probability at each check point
+    figID += 1
+    plt.figure(num=figID,figsize=(12,7),dpi=1200)
+    plt.title('Evolution of percentage of time slots under blockage evaluated at each checkpoint');
+    plt.plot(range(1*eval_ites,len(evolution_ratio_under_blockage)*eval_ites+1,eval_ites),evolution_ratio_under_blockage);
+    plt.xlabel('Training iteration (one iteration is one minute)');
+    plt.ylabel('Percentage of time slots under blockage');
+    plt.savefig(output_folder+'Average_percentage_under_blockage_evolution.eps',format='eps', facecolor='w', transparent=False)
+    
+    # Smoothed reward during the whole training time
+    figID += 1
+    ave_slots = slots
     evolution_reward_smooth = np.zeros(int(len(evolution_reward)/ave_slots))
     for i in range(len(evolution_reward_smooth)):
         iStart = i*ave_slots
         iEnd = (i+1)*ave_slots
         evolution_reward_smooth[i] = np.mean(evolution_reward[iStart:iEnd])
-    plt.figure(num=figID,figsize=(12,7),dpi=100)
+    plt.figure(num=figID,figsize=(12,7),dpi=1200)
     plt.title('Single-shot training evolution');
     plt.plot(range(0,len(evolution_reward),ave_slots),evolution_reward_smooth);
     plt.xlabel('Time slots');
-    plt.ylabel('Rewards');
-    plt.savefig(output_folder+'Single_training_evolution.png',format='png', facecolor='w', transparent=False)
+    plt.ylabel('Reward');
+    plt.savefig(output_folder+'Single_training_evolution.eps',format='eps', facecolor='w', transparent=False)
 
+    
+    #----------------------------------------------------------------
+    # Results from last evaluation running limited number of slots
+    #----------------------------------------------------------------
+    # CDF Queue length
     mean_queue_length = np.mean(Queue_Eval,axis=2)
     mean_queue_length = np.mean(mean_queue_length,axis=0)
     figID += 1
-    plt.figure(num=figID,figsize=(7,7),dpi=100)
+    plt.figure(num=figID,figsize=(7,7),dpi=1200)
     plt.title('Distribution of queue length')
     n_linspace = 100
     [P, b] = cdf_dist_P_vs_b(mean_queue_length,n_linspace)
     plt.plot(b,P)
     plt.xlabel('Averaged queue length q')
     plt.ylabel('Prob (queue length > q)')
-    plt.savefig(output_folder+'CDF_queue_length_last_evaluation.png',format='png', facecolor='w', transparent=False)
-
+    plt.savefig(output_folder+'CDF_queue_length_last_evaluation.eps',format='eps', facecolor='w', transparent=False)
+    
+    # Evolution of queue length
     figID += 1
-    plt.figure(num=figID,figsize=(7,7),dpi=100)
+    plt.figure(num=figID,figsize=(7,7),dpi=1200)
     plt.title('Evolution of average queue length')
     plt.plot(range(slots),mean_queue_length[0:slots])
     plt.xlabel('Time slot index')
     plt.ylabel('Average queue length')
-    plt.savefig(output_folder+'Evolution_queue_length_last_evaluation.png',format='png', facecolor='w', transparent=False)
+    plt.savefig(output_folder+'Evolution_queue_length_last_evaluation.eps',format='eps', facecolor='w', transparent=False)
     
+    # CDF of delay
     ave_Delay_dist_Eval = np.mean(np.mean(Delay_dist_Eval,axis=2),axis=0)
     ave_Delay_dist = ave_Delay_dist_Eval/np.sum(ave_Delay_dist_Eval)
     ave_Delay_CDF = np.cumsum(ave_Delay_dist)
     figID += 1
-    plt.figure(num=figID,figsize=(7,7),dpi=100)
+    plt.figure(num=figID,figsize=(7,7),dpi=1200)
     plt.title('CDF of delay (slots)')
     max_delay_to_show = slots+1
+    max_delay_to_show = 20
     max_delay_to_show = min(max_delay_to_show,slots+1)
-    plt.plot(range(max_delay_to_show),ave_Delay_CDF[0:max_delay_to_show+1])
+    plt.plot(range(max_delay_to_show),ave_Delay_CDF[0:max_delay_to_show])
     plt.xlabel('Averaged delay in slots t')
     plt.ylabel('Prob (delay <= t)')
-    plt.savefig(output_folder+'CDF_delay_last_evaluation.png',format='png', facecolor='w', transparent=False)
+    plt.savefig(output_folder+'CDF_delay_last_evaluation.eps',format='eps', facecolor='w', transparent=False)
     plt.show()

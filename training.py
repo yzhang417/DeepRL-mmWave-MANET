@@ -25,9 +25,11 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
              eval_loops, eval_ites, device, clip_queues):
     
     # Init
-    evolution_reward_evaluated = []
-    evolution_reward = []
-    evolution_queue_length = []
+    evolution_reward = [] # Evolution of reward of the whole training process 
+    evolution_queue_length = [] # Evolution of the queue length of the whole training process 
+    evolution_reward_evaluated = [] # Evolution of reward at each checking point for Slots time slots
+    evolution_ratio_under_blockage = [] # Evolution of ratio under blocakge at each checking point for Slots time slots
+    evolution_ave_delay = [] # Evolution of average delay at each checking point for Slots time slots
     num_batch = np.ceil(slots/batches)
     if decaying_clip_param:
         clip_param_decay_amount = 1/(iterations*slots/batches)
@@ -166,7 +168,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
                 # Prints results
                 if done:
                     time_per_ite = time.time() - t1
-                    sys.stdout.write("Ite: {:0>4d}, A_loss: {:+.10f}, C_loss: {:+.5f}, E_loss: {:+.5f}, Ave final queue: {:.2f}, Ave reward: {:.3f}, Time: {:.3f}\n".format(ite, actor_loss, critic_loss, entropy_loss, np.mean(state.Queue_length), np.mean(rewards_episode), time_per_ite))
+                    sys.stdout.write("Ite: {:0>4d}, A_loss: {:+.5f}, C_loss: {:+.5f}, E_loss: {:+.5f}, Final queue: {:.2f}, Ave reward: {:.3f}, Time: {:.3f}\n".format(ite, actor_loss, critic_loss, entropy_loss, np.mean(state.Queue_length), np.mean(rewards_episode), time_per_ite))
                     t1 = time.time()
                 
                 # Clear up the following lists
@@ -182,26 +184,37 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
         # Evaluation at checkpoint
         if ((ite+1) % eval_ites == 0 and ite > 0) or ite == iterations-1:
             # Evaluating the result
-            if ite == iterations-1: eval_loops = eval_loops*10
+            if ite == iterations-1: eval_loops = eval_loops*5
             Final_queue, Ave_npkts_dep_per_slot, Queue_Eval, Delay_dist_Eval,\
             Ave_num_using_relay, Ave_num_using_relay_detailed,\
-            Ave_num_doing_tracking, Ave_num_doing_tracking_detailed =\
+            Ave_num_doing_tracking, Ave_num_doing_tracking_detailed, Ave_ratio_under_bblockage =\
             evaluation(actor_critic_net,env.env_parameter,slots,eval_loops)
             sys.stdout.write("\n----------------------------------------\n")
             sys.stdout.write("Evaluation starts\n")
             sys.stdout.write("----------------------------------------\n")
-            sys.stdout.write("Iterations completed:{:4d}; Final_queue: {:.2f}; Npkts: {:.6f} \n".format(ite+1,Final_queue,Ave_npkts_dep_per_slot))
+            sys.stdout.write("Iterations completed:{:4d}; Final queue: {:.2f}; Npkts: {:.6f} \n".format(ite+1,Final_queue,Ave_npkts_dep_per_slot))
             sys.stdout.write("Current learning rate:{:.5f}; Current clipping parameter: {:.3f} \n".format(scheduler.get_last_lr()[0],clip_param))
             sys.stdout.write("Within {:3d} slots; Average uses of relay:{:.2f}; Average uses of tracking: {:.3f} \n".format(slots, Ave_num_using_relay,Ave_num_doing_tracking))
             print('Detailed relay usages')
             print(Ave_num_using_relay_detailed)
             print('Detailed ue tracking')
             print(Ave_num_doing_tracking_detailed)
+            print('Average percentage of main link under blockage')
+            print(Ave_ratio_under_bblockage)
+            ave_delay_in_slots_dist = np.sum(np.mean(Delay_dist_Eval,axis=0),axis=1)/\
+            np.sum(np.mean(Delay_dist_Eval,axis=0))
+            ave_delay_in_slots = \
+            np.dot(np.transpose(ave_delay_in_slots_dist),np.asarray(range(len(ave_delay_in_slots_dist))))
+            print('Average delay of packets in slots')
+            print(ave_delay_in_slots)
             sys.stdout.write("\n----------------------------------------\n")
             sys.stdout.write("Evaluation ends\n")
             sys.stdout.write("----------------------------------------\n")
+            # Save the parameter evolution
             evolution_reward_evaluated.append(Ave_npkts_dep_per_slot)
-         
+            evolution_ratio_under_blockage.append(Ave_ratio_under_bblockage)
+            evolution_ave_delay.append(ave_delay_in_slots)
+            
         # Code Profiler
         if profiling_code and ite == 0:
             print('\n-------------------------------------------------------------------------------')
@@ -216,7 +229,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             print(s.getvalue())
     
     # Return results
-    return evolution_reward_evaluated, evolution_queue_length, evolution_reward, Queue_Eval, Delay_dist_Eval, actor_critic_net
+    return evolution_reward_evaluated, evolution_queue_length, evolution_reward, Queue_Eval, Delay_dist_Eval, evolution_ratio_under_blockage, evolution_ave_delay, actor_critic_net
 
 
 
@@ -314,6 +327,7 @@ def evaluation(actor_critic_net, env_parameter, slots, LOOP):
     envEvaluation = envs(env_parameter,slots)
     num_using_relay = np.zeros((env_parameter.N_UE,env_parameter.N_UE),dtype=int)
     num_doing_tracking = np.zeros(env_parameter.N_UE,dtype=int)
+    num_under_blockage = np.zeros((LOOP,slots),dtype=int);
     # Evaluation loop
     for loop in range(LOOP):  
         state = envEvaluation.reset();
@@ -323,7 +337,7 @@ def evaluation(actor_critic_net, env_parameter, slots, LOOP):
             Vval, pi = actor_critic_net.forward(input_state)
             # Choose an action from the generated policy
             pi_dist = pi.detach().cpu().numpy()
-            action, action_chosen_ndarray, action_chosen_index= choose_action(pi_dist, env_parameter)
+            action, action_chosen_ndarray, action_chosen_index = choose_action(pi_dist, env_parameter)
             action_sanity_check(slot, action, state)
             if state.Is_D2D_Link_Active:
                 num_using_relay[state.Tx_ID_D2D_Link,state.Rx_ID_D2D_Link] += 1
@@ -331,9 +345,12 @@ def evaluation(actor_critic_net, env_parameter, slots, LOOP):
                 num_doing_tracking[state.UE_ID_BS2UE_Link_Last_Slot] += 1
             # Interaction with the enviroment to get a new state and a step-level reward
             state, output, reward, done = envEvaluation.step(state, action, envEvaluation.channel_realization())
+            num_under_blockage[loop,slot] = envEvaluation.is_in_blockage[action.Relay_ID,action.Relay_ID]
             Queue[loop,slot,:] = envEvaluation.Queue[slot,:]
             npkts_departure_evolution[loop,slot,:] = envEvaluation.npkts_departure_evolution[slot,:]
         Delay_Dist[loop,:,:] = envEvaluation.delay_dist
+        Delay_Dist[loop,:,:] = envEvaluation.get_delay_distribution()
+                        
     # Output results
     Final_queue = np.mean(np.mean(Queue,axis=2),axis=0)[-1]
     Ave_npkts_dep_per_slot = np.mean(np.sum(npkts_departure_evolution,axis=2))
@@ -341,5 +358,6 @@ def evaluation(actor_critic_net, env_parameter, slots, LOOP):
     Ave_num_using_relay_detailed = num_using_relay/LOOP
     Ave_num_doing_tracking = np.sum(num_doing_tracking)/LOOP
     Ave_num_doing_tracking_detailed = num_doing_tracking/LOOP
+    Ave_ratio_under_bblockage = np.mean(num_under_blockage)
     return Final_queue, Ave_npkts_dep_per_slot, Queue, Delay_Dist, Ave_num_using_relay, Ave_num_using_relay_detailed,\
-Ave_num_doing_tracking, Ave_num_doing_tracking_detailed
+Ave_num_doing_tracking, Ave_num_doing_tracking_detailed, Ave_ratio_under_bblockage
