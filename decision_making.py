@@ -9,7 +9,7 @@ import copy
 import bandit_function as bf
 from heuristic_tracking_selection import heuristic_tracking_selection
 
-def decision_making(loop, ct, scheme_id, state_list, action_list, lastOutput_list,\
+def decision_making(ct, scheme_id, state_list, action_list, lastOutput_list,\
                     bandit_bw_para_list, bandit_relay_para_list, scheme_setting_list, env_parameter):
     
     # Queue length
@@ -34,15 +34,32 @@ def decision_making(loop, ct, scheme_id, state_list, action_list, lastOutput_lis
 
     ##---------------------------- ACTION DECICSION ----------------------------
     
+#     # Action on UE selection for BS2UE link
+#     if state_list[scheme_id].Is_Tracking and operator.not_(state_list[scheme_id].Is_D2D_Link_Active): 
+#         UE_ID_BS2UE_link_Current = state_list[scheme_id].UE_ID_BS2UE_Link_Last_Slot;
+#     else:
+#         v = np.amin(n_BS2UE_copy);
+#         if v < env_parameter.min_service_guaranteed:
+#             UE_ID_BS2UE_link_Current = np.argmin(n_BS2UE_copy);
+#         else:
+#             UE_ID_BS2UE_link_Current = np.argmax(Queue_length_copy*state_list[scheme_id].Reff_BS2UE_Estimated);
+#         if state_list[scheme_id].Is_D2D_Link_Active and \
+#         (UE_ID_BS2UE_link_Current == state_list[scheme_id].Tx_ID_D2D_Link or \
+#          UE_ID_BS2UE_link_Current == state_list[scheme_id].Rx_ID_D2D_Link):
+#             pdb.set_trace()
+#             sys.exit('Cannot serve the user who is in the current D2D link!');
+#     action_list[scheme_id].UE_ID_BS2UE_Link = UE_ID_BS2UE_link_Current; 
+
     # Action on UE selection for BS2UE link
-    if state_list[scheme_id].Is_Tracking and operator.not_(state_list[scheme_id].Is_D2D_Link_Active): 
+    # Minimum number of service for each user is guaranteed before user schedueling and tracking mechanism
+    v = np.amin(n_BS2UE_copy);
+    if v < env_parameter.min_service_guaranteed:
+        state_list[scheme_id].Is_Tracking = False
+        UE_ID_BS2UE_link_Current = np.argmin(n_BS2UE_copy)
+    elif state_list[scheme_id].Is_Tracking and operator.not_(state_list[scheme_id].Is_D2D_Link_Active): 
         UE_ID_BS2UE_link_Current = state_list[scheme_id].UE_ID_BS2UE_Link_Last_Slot;
     else:
-        v = np.amin(n_BS2UE_copy);
-        if v < env_parameter.min_service_guaranteed:
-            UE_ID_BS2UE_link_Current = np.argmin(n_BS2UE_copy);
-        else:
-            UE_ID_BS2UE_link_Current = np.argmax(Queue_length_copy*state_list[scheme_id].Reff_BS2UE_Estimated);
+        UE_ID_BS2UE_link_Current = np.argmax(Queue_length_copy*state_list[scheme_id].Reff_BS2UE_Estimated);
         if state_list[scheme_id].Is_D2D_Link_Active and \
         (UE_ID_BS2UE_link_Current == state_list[scheme_id].Tx_ID_D2D_Link or \
          UE_ID_BS2UE_link_Current == state_list[scheme_id].Rx_ID_D2D_Link):
@@ -80,6 +97,6 @@ def decision_making(loop, ct, scheme_id, state_list, action_list, lastOutput_lis
     operator.not_(action_list[scheme_id].Is_D2D_Link_Activated_For_Next_Slot) and \
     np.amin(state_list[scheme_id].n_BS2UE) >= 1:
         action_list[scheme_id].Is_Tracking_Required_For_Next_Slot = \
-        heuristic_tracking_selection(state_list[scheme_id],action_list[scheme_id]);
+        heuristic_tracking_selection(state_list[scheme_id],action_list[scheme_id],env_parameter);
     else: 
         action_list[scheme_id].Is_Tracking_Required_For_Next_Slot = False;

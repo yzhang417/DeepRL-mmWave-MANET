@@ -22,6 +22,9 @@ class def_state():
         self.Reff_BS2UE_Estimated = np.zeros(env_parameter.N_UE);
         self.Reff_BS2UE_Estimated[:] = 0;
         self.n_BS2UE = np.zeros(env_parameter.N_UE);
+        self.Reff_BS2UE_Tracking_Estimated = np.zeros(env_parameter.N_UE);
+        self.Reff_BS2UE_Tracking_Estimated[:] = 0;
+        self.n_BS2UE_Tracking = np.zeros(env_parameter.N_UE);
         self.est_arrival = np.zeros(env_parameter.N_UE);
         self.est_depart = np.floor(self.Reff_BS2UE_Estimated/env_parameter.mean_packet_size);
         self.Reff_BS2UE_Link_Last_Slot = 0;
@@ -140,6 +143,90 @@ class def_action():
         return len(self.to_ndarray())
 
     
+#-----------------------------------------------------------
+# Draw an action with the current policy distribution
+#-----------------------------------------------------------
+def choose_action(pi_dist, env_parameter):
+    action = def_action(env_parameter)
+    num_type_of_action = int(action.num_type_of_action)
+    num_action_per_type = action.num_action_per_type
+    num_action = action.num_actions_valide
+    threshold = 1e-8
+    pi_dist[np.where(pi_dist<threshold)] = 0
+    pi_dist = pi_dist/np.sum(pi_dist)
+    if abs(np.sum(pi_dist) - 1) > 1e-5:
+        sys.exit('Wrong distribution in training.py')
+    else:
+        pi_dist = pi_dist/np.sum(pi_dist)
+        action_chosen_index = np.random.choice(np.squeeze(np.asarray(range(num_action))), size=1, p=np.squeeze(pi_dist))
+    action_ndarray = action_index_to_action_ndarray(action_chosen_index,num_type_of_action,num_action_per_type)
+    action.update_action_with_array(action_ndarray)
+    return action, action_ndarray, np.squeeze(action_chosen_index)
+
+
+#-----------------------------------------------------------
+# Convert and index of action to a action ndarray
+#-----------------------------------------------------------
+def action_index_to_action_ndarray(action_chosen_index,num_type_of_action,num_action_per_type):
+    action_ndarray = np.zeros(num_type_of_action,dtype=int)
+    # Identify bw index
+    num_actions_per_bw = num_action_per_type[0]*num_action_per_type[1]+num_action_per_type[0]
+    action_ndarray[2] = action_chosen_index // num_actions_per_bw
+    # Identify ue index
+    action_chosen_index_new = action_chosen_index % num_actions_per_bw
+    action_chosen_index_ue = action_chosen_index_new // num_action_per_type[1]
+    action_chosen_index_relay = action_chosen_index_new % num_action_per_type[1]
+    action_ndarray[1] = action_chosen_index_relay
+    if action_chosen_index_ue < num_action_per_type[0]:
+        action_ndarray[0] = action_chosen_index_ue
+        action_ndarray[3] = 0
+    else:
+        action_ndarray[0] = action_chosen_index_relay
+        action_ndarray[3] = 1
+    for i in range(num_type_of_action):
+        if action_ndarray[i] >= num_action_per_type[i]:
+            sys.exit('Wrong transformation from action index to action array')
+    return action_ndarray
+
+
+#-----------------------------------------------------------
+# Convert a action ndarray to a instance of def_action
+#-----------------------------------------------------------
+def action_ndarray_to_action_index(action_ndarray,num_type_of_action,num_action_per_type):
+    action_index = int(0)
+    num_actions_per_bw = num_action_per_type[0]*num_action_per_type[1]+num_action_per_type[0]
+    action_index = action_index + action_ndarray[2] * num_actions_per_bw
+    action_index = action_index + action_ndarray[1]
+    if action_ndarray[3] == 0:
+        action_index = action_index + action_ndarray[0]*num_action_per_type[1]
+    else:
+        action_index = action_index + num_action_per_type[0]*num_action_per_type[1]
+    return action_index
+
+
+#-----------------------------------------------------------
+# Check the feasibility of the made action
+#-----------------------------------------------------------
+def action_sanity_check(slot, action, state):
+    if slot>0 and action.UE_ID_BS2UE_Link<0:
+        pdb.set_trace()
+        sys.exit('Error: constraint violated: negative UE index occurs')
+    violation_tracking = state.Is_Tracking and \
+    ((action.UE_ID_BS2UE_Link != state.UE_ID_BS2UE_Link_Last_Slot) or state.Is_D2D_Link_Active)
+    if violation_tracking:
+        pdb.set_trace()
+        sys.exit('Error: constraint violated: tracking order is not performed')
+    violation_d2d_link = state.Is_D2D_Link_Active and\
+    (action.UE_ID_BS2UE_Link == state.Tx_ID_D2D_Link or\
+     action.UE_ID_BS2UE_Link == state.Rx_ID_D2D_Link or\
+     action.Relay_ID == state.Tx_ID_D2D_Link or\
+     action.Relay_ID == state.Rx_ID_D2D_Link or\
+     state.Tx_ID_D2D_Link<0 or state.Rx_ID_D2D_Link<0)
+    if violation_d2d_link:
+        pdb.set_trace()
+        sys.exit('Error: constraint violated: UEs in D2D link cannot be scheduled')
+        
+
 #----------------------------------------------------
 # class of output of enviroment
 #----------------------------------------------------

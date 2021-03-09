@@ -48,7 +48,8 @@ def calculate_ground_truth_optimal_beamwidth(slots, LOOP):
                     MCS_ID_BS2UE = len(np.where(envEvaluation.env_parameter.SNR_Value<=SNR_BS2UE_dB)[0])-1;
                     Reff_BS2UE_Link = Coeff*envEvaluation.env_parameter.Rate_Value[MCS_ID_BS2UE];
                     reff_statistic[loop,ue_id,bw_id] = Reff_BS2UE_Link
-    outage_coeff = final_eff_coeff/Coeff
+    outage_coeff = final_eff_coeff/Coeff_BS2UE
+    
     return reff_statistic, final_eff_coeff, outage_coeff, env_parameter
 
 

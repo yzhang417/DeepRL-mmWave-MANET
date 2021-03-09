@@ -30,6 +30,7 @@ class def_bandit_relay_parameter():
         M = env_parameter.M;
         N_UE = env_parameter.N_UE;        
         self.alpha_wmts = np.ones((K_relay,M+1,N_UE));
+        self.WMTS_Num_Relay_Use = np.sum((self.alpha_wmts-1),axis=1);
 
         
 #-------------------------------------------------------------------------
@@ -52,6 +53,8 @@ def bandit_bw_selection(bandit_bw_para, action, env_parameter):
     if np.isinf(np.amax(UWMTS_Mean_Codebook)):
         It = np.argmax(UWMTS_Mean_Codebook)
         UWMTS_CountLeader[It] = 0;
+    elif np.amin(UWMTS_Num_Codebook_Use) < env_parameter.min_use_per_cb_guaranteed:
+        It = np.argmin(UWMTS_Num_Codebook_Use)
     else:
         TSIndex = np.zeros(K);
         Leadert = np.argmax(UWMTS_Mean_Codebook); # Decide leader at index t
@@ -84,26 +87,39 @@ def bandit_relay_selection(bandit_relay_para, state, action, env_parameter):
     RateNor = env_parameter.RateNor;
     UE_ID = action.UE_ID_BS2UE_Link;
     alpha_wmts = bandit_relay_para.alpha_wmts[:,:,UE_ID];
+    WMTS_Num_Relay_Use = bandit_relay_para.WMTS_Num_Relay_Use[:,UE_ID];
     legible_arms = np.asarray(range(K));
     if state.Is_D2D_Link_Active:
         legible_arms[state.Tx_ID_D2D_Link] = -5
         legible_arms[state.Rx_ID_D2D_Link] = -5
         legible_arms = np.squeeze(np.where(legible_arms>=0))
-    legible_It = False;        
-    while operator.not_(legible_It):
-        TSIndex = np.zeros(len(legible_arms));
-        for k in range(len(legible_arms)):
-            Lk = np.random.dirichlet(alpha_wmts[k,:]);
-            TSIndex[k] = np.dot(RateNor,Lk);
-        It = legible_arms[np.argmax(TSIndex)]; # Decide the arm to play It
-        # UE in D2D link cannot be relay
+    if np.amin(WMTS_Num_Relay_Use[legible_arms]) < env_parameter.min_use_per_relay_guaranteed:
+        It = legible_arms[np.argmin(WMTS_Num_Relay_Use[legible_arms])]
         if state.Is_D2D_Link_Active:
             if It != state.Tx_ID_D2D_Link and It != state.Rx_ID_D2D_Link:
                 legible_It = True;
         else:
-            legible_It = True; 
+            legible_It = True;
         if operator.not_(legible_It):
-            print('Something wrong in bandit_relay_selection')
+            print('Something wrong in bandit_relay_selection() part 1')
+    else:
+        legible_It = False;        
+        while operator.not_(legible_It):
+            TSIndex = np.zeros(len(legible_arms));
+            for k in range(len(legible_arms)):
+                Lk = np.random.dirichlet(alpha_wmts[k,:]);
+                TSIndex[k] = np.dot(RateNor,Lk);
+            It = legible_arms[np.argmax(TSIndex)]; # Decide the arm to play It
+            # UE in D2D link cannot be relay
+            if state.Is_D2D_Link_Active:
+                if It != state.Tx_ID_D2D_Link and It != state.Rx_ID_D2D_Link and \
+                WMTS_Num_Relay_Use[It] >= env_parameter.min_use_per_relay_guaranteed:
+                    legible_It = True;
+            else:
+                if WMTS_Num_Relay_Use[It] >= env_parameter.min_use_per_relay_guaranteed:
+                    legible_It = True; 
+            if operator.not_(legible_It):
+                print('Something wrong in bandit_relay_selection() part 2')
     return It
 
 
@@ -152,4 +168,5 @@ def update_bandit_relay_para(bandit_relay_para,state,action,output,env_parameter
         if UE_ID != action.Relay_ID:
             sys.exit('UE Id should be identical to the relay ID when no D2D link to be activated for the next slot');
         bandit_relay_para.alpha_wmts[UE_ID,mt1,UE_ID] += 1
+    bandit_relay_para.WMTS_Num_Relay_Use = np.sum((bandit_relay_para.alpha_wmts-1),axis=1);
     return bandit_relay_para

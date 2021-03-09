@@ -50,15 +50,16 @@ def env_init(Netw_topo_id):
         radius = np.array([15, 15, 25, 30, 30]);  # Distance between Tx and Rx
         angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
         lambda_ratio = np.array([1, 1, 3, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.2, 0.2, 0.2, 0.2, 0.2]); # Average percentage of slots in blockage
+        target_prob_blockage_to_AP = np.array([0.1, 0.1, 0.1, 0.1, 0.1]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 4: 
         N_UE = 5; # Number of users 
         radius = np.array([15, 15, 25, 30, 30]);  # Distance between Tx and Rx
         angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
         lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.2, 0.2, 0.2, 0.2, 0.2]); # Average percentage of slots in blockage
+        target_prob_blockage_to_AP = np.array([0.1, 0.1, 0.1, 0.1, 0.1]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
+        
     target_prob_blockage = np.ones((N_UE,N_UE)) - np.diag(np.ones(N_UE))
     target_prob_blockage = target_prob_blockage * target_prob_blockage_D2D + np.diag(target_prob_blockage_to_AP)
     Xcoor_init, Ycoor_init = pol2cart(np.deg2rad(angle),radius);
@@ -68,12 +69,13 @@ def env_init(Netw_topo_id):
     # -----------------------------------------------
     # Beam training setting (realignment periodicity)
     # -----------------------------------------------
-    t_slot_vec = np.array([10, 20, 40, 80, 160])*1e-3;  # Realignment periodicity in seconds (5G NR)
-    t_slot = 40*1e-3;         # Time duration for a single slot in seconds
-    Num_arrays = 4;           # Number of antenna arrays equipped to cover 360 degrees
+    t_slot = 10 * 1e-3;       # Time duration for a single slot in seconds
+    t_SSW = 10 * 1e-6;        # Time of SSW frame in seconds (time duration for per measurement)
+    Num_arr_AP = 4;           # Number of antenna arrays equipped to cover 360 degrees
+    Num_arr_UE = 4;           # Number of antenna arrays equipped to cover 360 degrees
     Beampair_Repetition = 1;  # Repetion of each beam pair sounding
     BeamWidth_vertical = 75;  # Elevation beamwidth
-    single_side_beam_training = False;    # Double side beam training
+    single_side_beam_training = False;    # Double side beam training    
     
     
     # -------------------------------------
@@ -88,8 +90,8 @@ def env_init(Netw_topo_id):
     v_self_rotate_min = 0  # minimum ratation speed in degrees/s
     v_self_rotate_max = 10  # maximum ratation speed in degrees/s
     number_last_rotate = np.zeros(N_UE+1) # last index is for the mobility of AP
-    max_number_last_rotate = 5
-    max_number_last_direction = 5
+    max_number_last_rotate = 20
+    max_number_last_direction = 20
     
     
     # -------------------------------------
@@ -103,6 +105,7 @@ def env_init(Netw_topo_id):
     prob_blockage = target_prob_blockage/\
     (target_prob_blockage+(min_blockage_duration+max_blockage_duration)/2*(1-target_prob_blockage))  
 
+    
     # -------------------------------------
     # UE packet arrival model
     # -------------------------------------
@@ -119,7 +122,7 @@ def env_init(Netw_topo_id):
     #channel_corr_coeff = np.array([0.8,0.2]); # Channel time correlation
     channel_corr_coeff = np.array([1]);
     mean_X_coeff = 0;
-    sigma_X_coeff = np.sqrt(2);
+    sigma_X_coeff = np.sqrt(4);
     mean_X = mean_X_coeff*np.zeros((N_UE,N_UE));
     sigma_X = sigma_X_coeff*np.ones((N_UE,N_UE));
 
@@ -132,9 +135,8 @@ def env_init(Netw_topo_id):
     W2 = 5;             # Implementation Loss
     W = W1 + W2;        # Total link budget
     B = 2160 * 1e6;                # Bandwith in Hz
-    t_SSW = 10 * 1e-6;             # Time of SSW frame in seconds (time duration for per measurement)
     tracking_angular_space_d = 30; # Beam sweeping area in tracking slot
-    tracking_t_SSW = 0.2 * t_SSW;  # Time of SSW frame in tracking slot in seconds 
+    tracking_t_SSW = t_SSW;        # Time of SSW frame in tracking slot in seconds 
     tracking_t_slot = t_slot;      # Time duration for a single tracking slot in seconds
     Using_MCS = 1;      # Using MCS and sensibility of IEEE 802.11 ad standard (Can be updated to 5G NR)
     MCS = np.array([-1, 0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 9.1, 10, 11, 12, 12.1, 12.2, 12.3, 12.4, 12.5, 12.6]);
@@ -152,7 +154,8 @@ def env_init(Netw_topo_id):
     # -------------------------------------
     # Antenna setting at BS and UE
     # -------------------------------------
-    N_SSW_BS_vec = np.array([24, 32, 64, 128, 256, 512]); # Tx total number of sectors to cover 2D space
+    #N_SSW_BS_vec = np.array([24, 32, 64, 128, 256, 512]); # Tx total number of sectors to cover 2D space
+    N_SSW_BS_vec = np.array([16, 32, 64, 128, 256, 512]); # Tx total number of sectors to cover 2D space
     BeamWidth_TX_vec = 360./N_SSW_BS_vec;   # Tx antenna beamwidth
     N_SSW_UE_vec = 24;                      # Rx total number of sectors to cover 2D space
     BeamWidth_RX_vec = 360/N_SSW_UE_vec;    # Rx antenna beamwidth
@@ -196,6 +199,7 @@ def env_init(Netw_topo_id):
     env_parameter = def_env_para(); 
     env_parameter.Netw_topo_id = Netw_topo_id;
     env_parameter.workload = workload;
+    env_parameter.lambda_ratio = lambda_ratio;
     env_parameter.N_UE = N_UE;
     env_parameter.gamma_UWMTS = gamma_UWMTS;
     env_parameter.Rate_Value = Rate_Value;
@@ -210,7 +214,6 @@ def env_init(Netw_topo_id):
     env_parameter.B = B;
     env_parameter.fc = fc;
     env_parameter.t_slot = t_slot;
-    env_parameter.t_slot_vec = t_slot_vec;
     env_parameter.t_SSW = t_SSW;
     env_parameter.tracking_angular_space_d = tracking_angular_space_d;
     env_parameter.tracking_t_SSW = tracking_t_SSW;
@@ -224,31 +227,33 @@ def env_init(Netw_topo_id):
     env_parameter.Gr_D2D_dBi = Gr_D2D_dBi;
     env_parameter.Pn_dBm = Pn_dBm;
     env_parameter.Using_MCS = Using_MCS;
-    env_parameter.Num_arrays = Num_arrays;           
+    env_parameter.Num_arr_AP = Num_arr_AP;    
+    env_parameter.Num_arr_UE = Num_arr_UE;           
     env_parameter.Beampair_Repetition = Beampair_Repetition;
     env_parameter.BeamWidth_vertical = BeamWidth_vertical;
     env_parameter.single_side_beam_training = single_side_beam_training;
     
     if single_side_beam_training:
-        Coeff_BS2UE = (t_slot - t_SSW * (N_SSW_BS_vec + N_SSW_UE_vec) * Beampair_Repetition) / t_slot;
+        Coeff_BS2UE = 1 - t_SSW / t_slot * (N_SSW_BS_vec+N_SSW_UE_vec)*Beampair_Repetition/(Num_arr_AP*Num_arr_UE)
     else:
-        Coeff_BS2UE = (t_slot - t_SSW * (N_SSW_BS_vec * N_SSW_UE_vec) / Num_arrays) / t_slot;
+        Coeff_BS2UE = 1 - t_SSW / t_slot * (N_SSW_BS_vec*N_SSW_UE_vec)*Beampair_Repetition/(Num_arr_AP*Num_arr_UE)
     Coeff_BS2UE[np.where(Coeff_BS2UE<0)[0]] = 0;
     env_parameter.Coeff_BS2UE = Coeff_BS2UE;
+    
     if single_side_beam_training:
-        Coeff_BS2UE_Tracking = (tracking_t_slot - tracking_t_SSW * \
-                                np.ceil(tracking_angular_space_d/360 * \
-                                        (N_SSW_BS_vec + N_SSW_UE_vec) * Beampair_Repetition)) / tracking_t_slot;
+        Coeff_BS2UE_Tracking = 1 - tracking_t_SSW / tracking_t_slot * \
+        (np.ceil(tracking_angular_space_d/360*N_SSW_BS_vec)+np.ceil(tracking_angular_space_d/360*N_SSW_UE_vec))*\
+        Beampair_Repetition
     else:
-        Coeff_BS2UE_Tracking = (tracking_t_slot - tracking_t_SSW * \
-                                np.ceil(tracking_angular_space_d/360 + \
-                                        (N_SSW_BS_vec * N_SSW_UE_vec))) / tracking_t_slot;
+        Coeff_BS2UE_Tracking = 1 - tracking_t_SSW / tracking_t_slot * \
+        (np.ceil(tracking_angular_space_d/360*N_SSW_BS_vec)*np.ceil(tracking_angular_space_d/360*N_SSW_UE_vec))*\
+        Beampair_Repetition
     Coeff_BS2UE_Tracking[np.where(Coeff_BS2UE_Tracking<0)[0]] = 0;
     env_parameter.Coeff_BS2UE_Tracking = Coeff_BS2UE_Tracking;
     if single_side_beam_training:
-        Coeff_D2D = (t_slot - t_SSW * (N_SSW_UE_vec + N_SSW_UE_vec) * Beampair_Repetition) / t_slot;
+        Coeff_D2D = (t_slot - t_SSW * (N_SSW_UE_vec + N_SSW_UE_vec) * Beampair_Repetition / (Num_arr_UE*Num_arr_UE)) / t_slot;
     else:
-        Coeff_D2D = (t_slot - t_SSW * (N_SSW_UE_vec * N_SSW_UE_vec) / Num_arrays) / t_slot;
+        Coeff_D2D = (t_slot - t_SSW * (N_SSW_UE_vec * N_SSW_UE_vec) / (Num_arr_UE*Num_arr_UE)) / t_slot;
     env_parameter.Coeff_D2D = Coeff_D2D;
     K_bw = len(N_SSW_BS_vec);
     env_parameter.K_bw = K_bw;
@@ -258,7 +263,9 @@ def env_init(Netw_topo_id):
     env_parameter.channel_corr_coeff = channel_corr_coeff;
     env_parameter.mean_X = mean_X;
     env_parameter.sigma_X = sigma_X;
-    env_parameter.min_service_guaranteed = N_UE*2;
+    env_parameter.min_use_per_cb_guaranteed = 5;
+    env_parameter.min_use_per_relay_guaranteed = 5;
+    env_parameter.min_service_guaranteed = N_UE*3;
 
     
     # -------------------------------------
@@ -379,18 +386,23 @@ class envs():
         output = self.enviroment(state, action, channel)   
         output.Reff_BS2UE_Estimated = state.Reff_BS2UE_Estimated
         output.n_BS2UE = state.n_BS2UE 
+        output.Reff_BS2UE_Tracking_Estimated = state.Reff_BS2UE_Tracking_Estimated
+        output.n_BS2UE_Tracking = state.n_BS2UE_Tracking
         output.est_depart = state.est_depart
         output.est_arrival = state.est_arrival
         
         # Departing packets and update queue statistics
         Reff_BS2UE_Estimated = state.Reff_BS2UE_Estimated
         n_BS2UE = state.n_BS2UE
-        UE_ID_BS2UE_link_Current = action.UE_ID_BS2UE_Link
+        Reff_BS2UE_Tracking_Estimated = state.Reff_BS2UE_Tracking_Estimated
+        n_BS2UE_Tracking = state.n_BS2UE_Tracking
+        UE_ID_BS2UE_link_Current = action.UE_ID_BS2UE_Link  
         
         # Update statistics caused by active D2D link
         if state.Is_D2D_Link_Active:
             # Update number of packets delivered in D2D link
             npkts_departed = min(output.npkts_departed_D2D_Link,self.Queue[self.ct,state.Rx_ID_D2D_Link])
+            npkts_departed_D2D = npkts_departed
             self.npkts_departure_evolution[self.ct,state.Rx_ID_D2D_Link] = npkts_departed
             # Update queues of D2D link
             self.Queue[self.ct,state.Rx_ID_D2D_Link] = self.Queue[self.ct,state.Rx_ID_D2D_Link]-npkts_departed;
@@ -416,6 +428,7 @@ class envs():
         if operator.not_(action.Is_D2D_Link_Activated_For_Next_Slot):
             # Update number of packets delivered in main link
             npkts_departed = min(output.npkts_departed_BS2UE_Link,self.Queue[self.ct,action.UE_ID_BS2UE_Link])
+            npkts_departed_Main = npkts_departed
             self.npkts_departure_evolution[self.ct,action.UE_ID_BS2UE_Link] = npkts_departed
             # Update queues of main link
             self.Queue[self.ct,action.UE_ID_BS2UE_Link] = self.Queue[self.ct,action.UE_ID_BS2UE_Link] - npkts_departed
@@ -435,7 +448,12 @@ class envs():
             Reff_BS2UE_Estimated[UE_ID_BS2UE_link_Current] =\
             (Reff_BS2UE_Estimated[UE_ID_BS2UE_link_Current]*n_BS2UE[UE_ID_BS2UE_link_Current] +\
             output.Reff_BS2UE_Link)/(n_BS2UE[UE_ID_BS2UE_link_Current] + 1);
-            n_BS2UE[UE_ID_BS2UE_link_Current] += 1;     
+            n_BS2UE[UE_ID_BS2UE_link_Current] += 1;    
+            # Update estimate of link quality for heuristic tracking decision
+            Reff_BS2UE_Tracking_Estimated[UE_ID_BS2UE_link_Current] =\
+            (Reff_BS2UE_Tracking_Estimated[UE_ID_BS2UE_link_Current]*n_BS2UE_Tracking[UE_ID_BS2UE_link_Current] +\
+            npkts_departed_Main*self.env_parameter.mean_packet_size)/(n_BS2UE_Tracking[UE_ID_BS2UE_link_Current] + 1);
+            n_BS2UE_Tracking[UE_ID_BS2UE_link_Current] += 1;
 
         
         # Reward (requiring post processing to reduce variance)
@@ -446,7 +464,8 @@ class envs():
         reward = np.sum(self.npkts_departure_evolution[self.ct,:]) / npkt_10gbps  
             
         # Estimate the departure rate and arrival rate
-        est_depart = np.floor(Reff_BS2UE_Estimated/self.env_parameter.mean_packet_size)
+        est_depart = Reff_BS2UE_Tracking_Estimated/self.env_parameter.mean_packet_size 
+        #est_depart = Reff_BS2UE_Estimated/self.env_parameter.mean_packet_size 
         est_arrival = (state.est_arrival*self.ct + self.npkts_arrival)/(self.ct+1)
         
         # Check whether the episode ends
@@ -488,6 +507,8 @@ class envs():
         state.est_arrival = est_arrival
         state.Reff_BS2UE_Estimated = Reff_BS2UE_Estimated + 1e-8  # Avoid -inf * 0 when Reff_BS2UE_Estimated = 0 
         state.n_BS2UE = n_BS2UE
+        state.Reff_BS2UE_Tracking_Estimated = Reff_BS2UE_Tracking_Estimated
+        state.n_BS2UE_Tracking = n_BS2UE_Tracking
         state.Reff_BS2UE_Link_Last_Slot = output.Reff_BS2UE_Link
         state.Is_D2D_Link_Active = action.Is_D2D_Link_Activated_For_Next_Slot
         state.Tx_ID_D2D_Link = action.Relay_ID
