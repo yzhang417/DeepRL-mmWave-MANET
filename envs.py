@@ -307,7 +307,8 @@ def env_init(Netw_topo_id):
     env_parameter.max_blockage_duration = max_blockage_duration; # Number of maximum slots that blockage exists
     env_parameter.min_blockage_duration_guess = min_blockage_duration_guess;
     env_parameter.max_blockage_duration_guess = max_blockage_duration_guess;
-    
+    env_parameter.outage_coeff = np.zeros((env_parameter.N_UE,env_parameter.N_UE))
+    env_parameter.last_outage_coeff = np.zeros((env_parameter.N_UE,env_parameter.N_UE))
     return env_parameter
 
 
@@ -697,6 +698,7 @@ class envs():
     # UE self-rotation, time slot duration, and beamwidth
     # -------------------------------------
     def outage_coeff_update(self, state, action):
+        self.env_parameter.last_outage_coeff = self.env_parameter.outage_coeff
         outage_coeff = 0
         if self.ct == 0:
             return outage_coeff
@@ -779,6 +781,7 @@ class envs():
             else:
                 outage_coeff = 0
             self.outage_coeff[uTx,uRx] = outage_coeff
+            self.env_parameter.outage_coeff = self.outage_coeff
         
         return outage_coeff
 
@@ -892,6 +895,7 @@ class envs():
         output.MCS_ID_BS2UE = MCS_ID_BS2UE;
         output.MCS_ID_D2D = MCS_ID_D2D;
         output.MCS_ID_D2D_real = MCS_ID_D2D_real;
+        output.D2D_Link_Smaller = (Reff_D2D_Link < Reff_BS2UE_Link_Last_Slot)
 
         # Return object
         return output

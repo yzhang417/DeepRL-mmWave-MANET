@@ -57,6 +57,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
         # Clear up the following lists
         ratios = []          # List of (pi/pi_old) in a batch (by default a batch is an episode)
         Vvals = []           # List of predicted value function in a batch (by default a batch is an episode)
+        entropys = []           # List of predicted value function in a batch (by default a batch is an episode)
         rewards = []         # List of reward in a batch (by default a batch is an episode)
         rewards_episode = [] # List of reward in a batch (by default a batch is an episode)
         if ite == 0:
@@ -92,14 +93,21 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             oldlogProb = np.log(pi_dist[action_chosen_index])
             ratio = torch.exp(logProb-oldlogProb)
             
+            # Calulate the entropy
+            pi_revise = pi+1e-10
+            pi_revise = pi_revise/torch.sum(pi_revise)
+            entropy = - torch.sum(pi_revise*torch.log(pi_revise))
+            
+            
             # Interaction with the enviroment to get a new state and a step-level reward   
             state, output, reward, done = env.step(state, action, env.channel_realization())
             
-            # Cumulate the reward, value function and ratio
+            # Cumulate the reward, value function, ratio and entropy
             rewards_episode.append(reward)
             rewards.append(reward)
             Vvals.append(Vval)
             ratios.append(ratio)
+            entropys.append(entropy)
             
             # Save the last state of the current iteration (deepcopy is time consuming)
             if slot == slots-1 :
@@ -159,9 +167,16 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
                     critic_loss = value_coeff * torch.max(critic_losses_1,critic_losses_2).mean()
                 else:
                     critic_loss = value_coeff * critic_losses_1.mean()
+                    
                 # Entropy loss
-                entropy = - torch.sum(pi*torch.log(pi))
-                entropy_loss = - entropy_coeff * entropy
+                pi_revise = pi+1e-10
+                pi_revise = pi_revise/torch.sum(pi_revise)
+                entropy = - torch.sum(pi_revise*torch.log(pi_revise))
+                entropys.append(entropy)
+                entropys = torch.stack(entropys)
+                #entropy_loss = - entropy_coeff * entropy
+                entropy_loss = - entropy_coeff * torch.mean(entropys)
+                
                 # All loss
                 ac_loss = actor_loss + critic_loss + entropy_loss
 

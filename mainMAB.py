@@ -54,7 +54,7 @@ def main():
     parser.add_argument('--Netw_topo_id', default=1, type=int, help='Id of network topology')
     parser.add_argument('--output', default=None, help='output folder of training results')
     # Training process
-    parser.add_argument('--iterations', default=240, type=int, help='number of episodes')
+    parser.add_argument('--iterations', default=100, type=int, help='number of episodes')
     parser.add_argument('--slots', default=1500, type=int, help='number of slots in a single episode')
     parser.add_argument('--eval_loops', default=20, type=int, help='number of evaluations for a checkpoint')
     parser.add_argument('--eval_ites', default=1, type=int, help='number of iterations before each ckpt evaluation')
@@ -68,8 +68,6 @@ def main():
     #----------------------------------------------
     # Initialization
     #----------------------------------------------
-    #random.seed(13579)     # random seeds for reproducation
-    #np.random.seed(246810) # random seeds for reproducation
     Netw_topo_id = args.Netw_topo_id # Network topology             
     clip_queues = args.clip_queues  # Clip the queue for every iteration
     iterations = args.iterations # Number of iteration to train bandit
@@ -140,6 +138,13 @@ def main():
         lastOutput_list.append(def_output(env_parameter)); 
         env_list.append(envs(env_parameter,slots_training));
 
+        
+    #-----------------------------------------------------------
+    # Random seed
+    #-----------------------------------------------------------
+    #random.seed(13579)     # random seeds for reproducation
+    #np.random.seed(246810) # random seeds for reproducation
+        
     #----------------------------------------------
     # Training MAB-based scheduler
     #----------------------------------------------
@@ -179,6 +184,8 @@ def main():
             if scheme_setting_list[scheme_id].Is_RL:                
                 break
             else:
+                Last_BW_ID_BS2UE_Link = action_list[scheme_id].BW_ID_BS2UE_Link
+                last_MCS_ID_BS2UE = lastOutput_list[scheme_id].MCS_ID_BS2UE
                 decision_making(ct, scheme_id, state_list, action_list, lastOutput_list,\
                                 bandit_bw_para_list, bandit_relay_para_list, scheme_setting_list, \
                                 env_list[scheme_id].env_parameter)
@@ -195,6 +202,8 @@ def main():
             evolution_reward_MAB[scheme_id].append(reward)
 
             # Save last output
+            output_list[scheme_id].Last_BW_ID_BS2UE_Link = Last_BW_ID_BS2UE_Link
+            output_list[scheme_id].last_MCS_ID_BS2UE = last_MCS_ID_BS2UE
             lastOutput_list[scheme_id] = output_list[scheme_id]; 
 
             # Step-wise bandit vector update

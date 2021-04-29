@@ -39,7 +39,7 @@ def main():
     parser.add_argument('--Netw_topo_id', default=1, type=int, help='Id of network topology')
     parser.add_argument('--output', default=None, help='output folder of training results')
     # Training process
-    parser.add_argument('--iterations', default=240, type=int, help='number of episodes')
+    parser.add_argument('--iterations', default=100, type=int, help='number of episodes')
     parser.add_argument('--slots', default=1500, type=int, help='number of slots in a single episode')
     parser.add_argument('--batches', default=5, type=int, help='number of slots in a single batch')
     parser.add_argument('--eval_loops', default=20, type=int, help='number of evaluations for a checkpoint')
@@ -50,14 +50,14 @@ def main():
     parser.add_argument('--lr_decay_rate', default=0.9, type=float, help='decaying rate of learning rate')
     parser.add_argument('--lr_decay_steps', default=20, type=int, help='number of updates before decaying learning rate')
     # NN architecture
-    parser.add_argument('--a_hid_dim', default=128, type=int, help='number of layers for actor')
+    parser.add_argument('--a_hid_dim', default=128, type=int, help='number of units for actor')
     parser.add_argument('--c_hid_dim', default=128, type=int, help='number of units for critic')
     # PPO parameter
     parser.add_argument('--clip_param', default=0.2, type=int, help='clip parameter')
     parser.add_argument('--gamma', default=0.999, type=float, help='gamma parameter for GAE')
     parser.add_argument('--lambd', default=1.00, type=float, help='lambda parameter for GAE')
     parser.add_argument('--value_coeff', default=0.5, type=float, help='value loss coeffecient')
-    parser.add_argument('--entropy_coeff', default=0.05, type=float, help='entropy loss coeffecient')
+    parser.add_argument('--entropy_coeff', default=0.05, type=float, help='entropy loss coefficient')
     parser.add_argument('--decaying_clip_param', default=0, type=int, help='Whether to decay the clipping parameter')
     parser.add_argument('--clipping_critic', default=1, type=int, help='Whether to clip the critic')    
     #Print args
@@ -89,6 +89,12 @@ def main():
     #-----------------------------------------------------------
     Netw_topo_id = args.Netw_topo_id
     slots = args.slots
+    
+    #-----------------------------------------------------------
+    # Random seed
+    #-----------------------------------------------------------
+    #random.seed(13579)     # random seeds for reproducation
+    #np.random.seed(246810) # random seeds for reproducation
     
     #-----------------------------------------------------------
     # Training

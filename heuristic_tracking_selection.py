@@ -19,7 +19,7 @@ def heuristic_tracking_selection(state,action,env_parameter):
         active_ue = 0;
         if u == UE_ID_BS2UE_Link:
             active_ue = 1;
-        Queue_length_est_next_slot[u] = max(Queue_length[u] + est_arrival[u] - est_depart[u]*active_ue,0);
+        Queue_length_est_next_slot[u] = max(Queue_length[u] - est_depart[u]*active_ue,0) + est_arrival[u];
     
     # Estimated UE_ID_BS2UE_Link next time slot
     UE_ID_BS2UE_Link_est_next_slot = np.argmax(Queue_length_est_next_slot*Reff_BS2UE_Estimated);

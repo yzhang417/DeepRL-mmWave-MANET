@@ -68,7 +68,8 @@ def bandit_bw_selection(bandit_bw_para, action, env_parameter):
                 neighbor = np.array(range(0,K));
             for k in np.intersect1d(neighbor,np.array(range(0,K))):
                 Lk = np.random.dirichlet(alpha_uwmts[k,:]);                          
-                TSIndex[k] = np.dot(RateNor,Lk)*Coeff_BS2UE[k];
+                #TSIndex[k] = np.dot(RateNor,Lk)*Coeff_BS2UE[k];
+                TSIndex[k] = np.dot(RateNor,Lk);
             It = np.argmax(TSIndex); # Decide the arm to play It within the neighbors
             if len(np.intersect1d(It,neighbor)) == 0:
                 sys.exit('Error in not choosing arm within neighbor of leaders in UWMTS algorithm');
@@ -132,11 +133,17 @@ def update_bandit_bw_para(bandit_bw_para, action, output, env_parameter):
     mt = output.MCS_ID_BS2UE;
     UE_ID = action.UE_ID_BS2UE_Link;
     It = action.BW_ID_BS2UE_Link;
+    #-----Randomization-----
+    Coeff_Eff = env_parameter.Coeff_BS2UE[It] * (1-env_parameter.outage_coeff[UE_ID,UE_ID]);
+    #Coeff_Eff = (1-env_parameter.outage_coeff[UE_ID,UE_ID]);
+    if np.random.binomial(1,Coeff_Eff) == 0:
+        mt = 0; 
+    #-----Randomization-----
     alpha_uwmts = bandit_bw_para.alpha_uwmts[:,:,UE_ID];
     UWMTS_Mean_Codebook = bandit_bw_para.UWMTS_Mean_Codebook[:,UE_ID];
     UWMTS_Num_Codebook_Use = bandit_bw_para.UWMTS_Num_Codebook_Use[:,UE_ID];
     alpha_uwmts[It,mt] = alpha_uwmts[It,mt] + 1;
-    RateTmp = RateNor[mt]*Coeff_BS2UE[It];
+    RateTmp = RateNor[mt]*Coeff_Eff;
     if np.isinf(UWMTS_Mean_Codebook[It]):
         UWMTS_Mean_Codebook[It] = RateTmp;
     else:
@@ -154,19 +161,34 @@ def update_bandit_bw_para(bandit_bw_para, action, output, env_parameter):
 #------------------------------------------------------------------------- 
 def update_bandit_relay_para(bandit_relay_para,state,action,output,env_parameter):
     UE_ID = output.action.UE_ID_BS2UE_Link;
-    mt1 = output.MCS_ID_BS2UE;
-    mt2 = output.MCS_ID_D2D_real;
-    Coeff_BS2UE = env_parameter.Coeff_BS2UE[action.BW_ID_BS2UE_Link];
-    Coeff_D2D = env_parameter.Coeff_D2D;        
-    if np.random.binomial(1,Coeff_BS2UE) == 0:
-        mt1 = 0;
-    if np.random.binomial(1,Coeff_D2D*0.5) == 0:
-        mt2 = 0;
+    mMain = output.MCS_ID_BS2UE;
+    D2DlinkSmaller = True
+    #-----Randomization-----  
+    Coeff_Eff_Main = \
+    env_parameter.Coeff_BS2UE[action.BW_ID_BS2UE_Link] * (1-env_parameter.outage_coeff[UE_ID,UE_ID]);
+    if np.random.binomial(1,Coeff_Eff_Main) == 0:
+        mMain = 0;
+    if output.D2D_Link_Smaller:
+        Coeff_Eff_D2D = \
+        env_parameter.Coeff_D2D * (1-env_parameter.outage_coeff[state.Tx_ID_D2D_Link,state.Rx_ID_D2D_Link]);
+        #mt2 = output.MCS_ID_D2D_real;
+        mD2D = output.MCS_ID_D2D;
+        if np.random.binomial(1,Coeff_Eff_D2D*0.5) == 0:
+            mD2D = 0;
+    else:
+        Last_BW_ID_BS2UE_Link = output.Last_BW_ID_BS2UE_Link
+        Coeff_Eff_Main_Last = \
+        env_parameter.Coeff_BS2UE[Last_BW_ID_BS2UE_Link] * \
+        (1-env_parameter.last_outage_coeff[state.Tx_ID_D2D_Link,state.Tx_ID_D2D_Link]);
+        mD2D = output.last_MCS_ID_BS2UE
+        if np.random.binomial(1,Coeff_Eff_Main_Last*0.5) == 0:
+            mD2D = 0;
+    #-----Randomization-----    
     if state.Is_D2D_Link_Active:
-        bandit_relay_para.alpha_wmts[state.Tx_ID_D2D_Link,mt2,state.Rx_ID_D2D_Link] += 1
+        bandit_relay_para.alpha_wmts[state.Tx_ID_D2D_Link,mD2D,state.Rx_ID_D2D_Link] += 1
     if operator.not_(action.Is_D2D_Link_Activated_For_Next_Slot):
         if UE_ID != action.Relay_ID:
             sys.exit('UE Id should be identical to the relay ID when no D2D link to be activated for the next slot');
-        bandit_relay_para.alpha_wmts[UE_ID,mt1,UE_ID] += 1
+        bandit_relay_para.alpha_wmts[UE_ID,mMain,UE_ID] += 1
     bandit_relay_para.WMTS_Num_Relay_Use = np.sum((bandit_relay_para.alpha_wmts-1),axis=1);
     return bandit_relay_para
