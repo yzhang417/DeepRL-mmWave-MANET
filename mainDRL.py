@@ -39,10 +39,10 @@ def main():
     parser.add_argument('--Netw_topo_id', default=1, type=int, help='Id of network topology')
     parser.add_argument('--output', default=None, help='output folder of training results')
     # Training process
-    parser.add_argument('--iterations', default=100, type=int, help='number of episodes')
+    parser.add_argument('--iterations', default=120, type=int, help='number of episodes')
     parser.add_argument('--slots', default=1500, type=int, help='number of slots in a single episode')
     parser.add_argument('--batches', default=5, type=int, help='number of slots in a single batch')
-    parser.add_argument('--eval_loops', default=20, type=int, help='number of evaluations for a checkpoint')
+    parser.add_argument('--eval_loops', default=10, type=int, help='number of evaluations for a checkpoint')
     parser.add_argument('--eval_ites', default=1, type=int, help='number of iterations before each ckpt evaluation')
     parser.add_argument('--clip_queues', default=0, type=int, help='clip the queue at the end of each iteration')
     # Learning part
@@ -95,6 +95,8 @@ def main():
     #-----------------------------------------------------------
     #random.seed(13579)     # random seeds for reproducation
     #np.random.seed(246810) # random seeds for reproducation
+    random.seed()     # random seeds for reproducation
+    np.random.seed() # random seeds for reproducation
     
     #-----------------------------------------------------------
     # Training
