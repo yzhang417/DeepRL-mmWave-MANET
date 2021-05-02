@@ -155,7 +155,7 @@ def env_init(Netw_topo_id):
     # Antenna setting at BS and UE
     # -------------------------------------
     #N_SSW_BS_vec = np.array([24, 32, 64, 128, 256, 512]); # Tx total number of sectors to cover 2D space
-    N_SSW_BS_vec = np.array([16, 32, 64, 128, 256, 512]); # Tx total number of sectors to cover 2D space
+    N_SSW_BS_vec = np.array([24, 32, 64, 128, 256, 512]); # Tx total number of sectors to cover 2D space
     BeamWidth_TX_vec = 360./N_SSW_BS_vec;   # Tx antenna beamwidth
     N_SSW_UE_vec = 24;                      # Rx total number of sectors to cover 2D space
     BeamWidth_RX_vec = 360/N_SSW_UE_vec;    # Rx antenna beamwidth
