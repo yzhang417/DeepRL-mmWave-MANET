@@ -174,8 +174,10 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
                 entropy = - torch.sum(pi_revise*torch.log(pi_revise))
                 entropys.append(entropy)
                 entropys = torch.stack(entropys)
-                #entropy_loss = - entropy_coeff * entropy
+                
                 entropy_loss = - entropy_coeff * torch.mean(entropys)
+                #entropy = - torch.sum(pi*torch.log(pi))
+                #entropy_loss = - entropy_coeff * entropy
                 
                 # All loss
                 ac_loss = actor_loss + critic_loss + entropy_loss
@@ -234,7 +236,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             print('Average delay of packets in slots')
             print(ave_delay_in_slots)
             t_Eval = time.time() - t_Eval_start
-            print('Time spent at this CKPT is %f seconds' %ave_delay_in_slots)
+            print('Time spent at this CKPT is %f seconds' %t_Eval)
             sys.stdout.write("----------------------------------------\n")
             sys.stdout.write("Evaluation ends\n")
             sys.stdout.write("----------------------------------------\n")
