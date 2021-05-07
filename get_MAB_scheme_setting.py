@@ -12,70 +12,70 @@ class def_scheme_setting:
 def get_MAB_scheme_setting():
     scheme_setting_list = list();
 
-    # Scheme 0: Max-weight + no tracking + no relay + random bw
+    # Scheme 0: Max-weight + no tracking + no relay + random codebook
     scheme_setting = def_scheme_setting();
     scheme_setting.scheme_id = 0;
     scheme_setting.Is_bandit_relay = False;
     scheme_setting.Is_bandit_bw = False;
     scheme_setting.Is_heuristic_tracking = False;
     scheme_setting.Is_RL = False;
-    scheme_setting.legend = 'Max-weight + no tracking + no relay + random cb';
-    scheme_setting.color = 'r';
+    scheme_setting.legend = 'Max-weight UE scheduling without link configurations';
+    scheme_setting.color = 'g';
     scheme_setting_list.append(scheme_setting);
 
-    # Scheme 1: Max-weight + no tracking + no relay + bandit bw
+    # Scheme 1: Max-weight + no tracking + no relay + bandit codebook
     scheme_setting = def_scheme_setting();
     scheme_setting.scheme_id = 1;
     scheme_setting.Is_bandit_relay = False;
     scheme_setting.Is_bandit_bw = True;
     scheme_setting.Is_heuristic_tracking = False;
     scheme_setting.Is_RL = False;
-    scheme_setting.legend = 'Max-weight + no tracking + no relay + bandit cb';
-    scheme_setting.color = 'b';
+    scheme_setting.legend = 'Empirical MAB-based scheduler (relay selection and tracking are disabled)';
+    scheme_setting.color = 'm';
     scheme_setting_list.append(scheme_setting);
 
-    # Scheme 2: Max-weight + no tracking + bandit relay + random bw
+    # Scheme 2: Max-weight + no tracking + bandit relay + random codebook
     scheme_setting = def_scheme_setting();
     scheme_setting.scheme_id = 2;
     scheme_setting.Is_bandit_relay = True;
     scheme_setting.Is_bandit_bw = False;
     scheme_setting.Is_heuristic_tracking = False;
     scheme_setting.Is_RL = False;
-    scheme_setting.legend = 'Max-weight + no tracking + bandit relay + random cb';
-    scheme_setting.color = 'c';
+    scheme_setting.legend = 'Empirical MAB-based scheduler (codebook selection and tracking are disabled)';
+    scheme_setting.color = 'y';
     scheme_setting_list.append(scheme_setting);
 
-    # Scheme 3: Max-weight + heuristic tracking + no relay + random bw
+    # Scheme 3: Max-weight + heuristic tracking + no relay + random codebook
     scheme_setting = def_scheme_setting();
     scheme_setting.scheme_id = 3;
     scheme_setting.Is_bandit_relay = False;
     scheme_setting.Is_bandit_bw = False;
     scheme_setting.Is_heuristic_tracking = True;
     scheme_setting.Is_RL = False;
-    scheme_setting.legend = 'Max-weight + heuristic tracking + no relay + random cb';
-    scheme_setting.color = 'k';
+    scheme_setting.legend = 'Max-weight UE scheduling with beam tracking';
+    scheme_setting.color = 'c';
     scheme_setting_list.append(scheme_setting);
 
-    # Scheme 4: Max-weight + heuristic tracking + no relay + bandit bw
+    # Scheme 4: Max-weight + heuristic tracking + no relay + bandit codebook
     scheme_setting = def_scheme_setting();
     scheme_setting.scheme_id = 4;
     scheme_setting.Is_bandit_relay = False;
     scheme_setting.Is_bandit_bw = True;
     scheme_setting.Is_heuristic_tracking = True;
     scheme_setting.Is_RL = False;
-    scheme_setting.legend = 'Max-weight + heuristic tracking + no relay + bandit cb';
-    scheme_setting.color = 'g';
+    scheme_setting.legend = 'Empirical MAB-based scheduler (relay selection is disabled)';
+    scheme_setting.color = 'darkorange';
     scheme_setting_list.append(scheme_setting);
     
-    # Scheme 5: Max-weight + no tracking + bandit relay + bandit bw
+    # Scheme 5: Max-weight + no tracking + bandit relay + bandit codebook
     scheme_setting = def_scheme_setting();
     scheme_setting.scheme_id = 5;
     scheme_setting.Is_bandit_relay = True;
     scheme_setting.Is_bandit_bw = True;
     scheme_setting.Is_heuristic_tracking = False;
     scheme_setting.Is_RL = False;
-    scheme_setting.legend = 'Max-weight + no tracking + bandit relay + bandit cb';
-    scheme_setting.color = 'y';
+    scheme_setting.legend = 'Empirical MAB-based scheduler (tracking is disabled)';
+    scheme_setting.color = 'k';
     scheme_setting_list.append(scheme_setting);
     
     # Scheme 6: Max-weight + heuristic tracking + bandit relay + bandit bw (Our first proposal)
@@ -85,8 +85,8 @@ def get_MAB_scheme_setting():
     scheme_setting.Is_bandit_bw = True;
     scheme_setting.Is_heuristic_tracking = True;
     scheme_setting.Is_RL = False;
-    scheme_setting.legend = 'Max-weight + heuristic tracking + bandit relay + bandit cb';
-    scheme_setting.color = 'm';
+    scheme_setting.legend = 'Empirical MAB-based scheduler';
+    scheme_setting.color = 'b';
     scheme_setting_list.append(scheme_setting);
 
     # Scheme 7: Deep Reinforcement Learning (PPO)
@@ -96,8 +96,8 @@ def get_MAB_scheme_setting():
     scheme_setting.Is_bandit_bw = False;
     scheme_setting.Is_heuristic_tracking = False;
     scheme_setting.Is_RL = True;
-    scheme_setting.legend = 'Deep Reinforcement Learning (PPO)';
-    scheme_setting.color = 'darkorange';
+    scheme_setting.legend = 'DRL-based scheduler (PPO with A2C)';
+    scheme_setting.color = 'r';
     scheme_setting_list.append(scheme_setting);
     
     return scheme_setting_list

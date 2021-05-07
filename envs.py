@@ -32,6 +32,7 @@ def env_init(Netw_topo_id):
     # Network topology
     # -------------------------------------    
     if Netw_topo_id == 1:
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
         radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
         angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
@@ -39,6 +40,7 @@ def env_init(Netw_topo_id):
         target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 2:
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
         radius = np.array([15, 15, 25, 30, 30]);  # Distance between Tx and Rx
         angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
@@ -46,18 +48,20 @@ def env_init(Netw_topo_id):
         target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.05, 0.75, 0.75]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 3: 
+        workload = 1.2 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
-        radius = np.array([15, 15, 25, 30, 30]);  # Distance between Tx and Rx
-        angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
+        radius = np.array([15, 15, 25, 30, 20]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45, 10, 70]);   # Angle between Tx and Rx
         lambda_ratio = np.array([1, 1, 3, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.1, 0.1, 0.1, 0.1, 0.1]); # Average percentage of slots in blockage
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.05, 0.75, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 4: 
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
-        radius = np.array([15, 15, 25, 30, 30]);  # Distance between Tx and Rx
-        angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
-        lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.1, 0.1, 0.1, 0.1, 0.1]); # Average percentage of slots in blockage
+        radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
+        angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
+        lambda_ratio = np.array([1, 3, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
         
     target_prob_blockage = np.ones((N_UE,N_UE)) - np.diag(np.ones(N_UE))
@@ -109,7 +113,6 @@ def env_init(Netw_topo_id):
     # -------------------------------------
     # UE packet arrival model
     # -------------------------------------
-    workload = 1.0 * 1e9;                              # Total downlink data stream rate
     mean_packet_size = 2312*8;                         # Mean size of a single packet in bit
     lambda_ratio = lambda_ratio/np.sum(lambda_ratio);  
     total_arrival_rate = workload/mean_packet_size;    # Total packet arrival rate
