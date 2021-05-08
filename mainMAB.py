@@ -57,7 +57,7 @@ def main():
     parser.add_argument('--iterations', default=240, type=int, help='number of episodes')
     parser.add_argument('--slots', default=1500, type=int, help='number of slots in a single episode')
     parser.add_argument('--eval_loops', default=10, type=int, help='number of evaluations for a checkpoint')
-    parser.add_argument('--eval_ites', default=10, type=int, help='number of iterations before each ckpt evaluation')
+    parser.add_argument('--eval_ites', default=5, type=int, help='number of iterations before each ckpt evaluation')
     parser.add_argument('--clip_queues', default=False, type=int, help='clip the queue at the end of each iteration')
     parser.add_argument('--loading_DRL', default=False, type=int, help='load the trained DRL')
     #Print args
