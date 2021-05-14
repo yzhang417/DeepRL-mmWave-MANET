@@ -254,7 +254,7 @@ def main():
                 sys.stdout.write("Evaluation ends for scheme %d \n" % scheme_setting_list[scheme_id].scheme_id)
                 sys.stdout.write("----------------------------------------\n")
                 
-                breakpoint()
+                #breakpoint()
                 
                 # Save the parameter evolution
                 evolution_rate_ckpt_MAB[scheme_id].append(Ave_npkts_dep_per_slot*mean_packet_size/t_slot/1e9)
