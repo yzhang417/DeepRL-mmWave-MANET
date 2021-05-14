@@ -42,8 +42,8 @@ def main():
     parser.add_argument('--iterations', default=240, type=int, help='number of episodes')
     parser.add_argument('--slots', default=1500, type=int, help='number of slots in a single episode')
     parser.add_argument('--batches', default=5, type=int, help='number of slots in a single batch')
-    parser.add_argument('--eval_loops', default=10, type=int, help='number of evaluations for a checkpoint')
-    parser.add_argument('--eval_ites', default=5, type=int, help='number of iterations before each ckpt evaluation')
+    parser.add_argument('--eval_loops', default=20, type=int, help='number of evaluations for a checkpoint')
+    parser.add_argument('--eval_ites', default=1, type=int, help='number of iterations before each ckpt evaluation')
     parser.add_argument('--clip_queues', default=0, type=int, help='clip the queue at the end of each iteration')
     # Learning part
     parser.add_argument('--lr', default=0.001, type=float, help='actor/critic learning rate')

@@ -243,7 +243,9 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             # Save the parameter evolution            
             evolution_rate_ckpt.append(Ave_npkts_dep_per_slot*env.env_parameter.mean_packet_size/env.env_parameter.t_slot/1e9)
             evolution_delay_ckpt.append(ave_delay_in_slots)
-            evolution_ratio_blockage_ckpt.append(Ave_ratio_under_blockage)           
+            evolution_ratio_blockage_ckpt.append(Ave_ratio_under_blockage)     
+            
+            #breakpoint()
             
         # Code Profiler
         if profiling_code and ite == 0:

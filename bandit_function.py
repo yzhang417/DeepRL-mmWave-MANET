@@ -36,7 +36,7 @@ class def_bandit_relay_parameter():
 #-------------------------------------------------------------------------
 # Bandit BW selection
 #------------------------------------------------------------------------- 
-def bandit_bw_selection(bandit_bw_para, action, env_parameter):
+def bandit_bw_selection(bandit_bw_para, action, env_parameter, is_training=True):
     is_unimodal = False;
     K = env_parameter.K_bw;
     UE_ID = action.Relay_ID;
@@ -53,7 +53,7 @@ def bandit_bw_selection(bandit_bw_para, action, env_parameter):
     if np.isinf(np.amax(UWMTS_Mean_Codebook)):
         It = np.argmax(UWMTS_Mean_Codebook)
         UWMTS_CountLeader[It] = 0;
-    elif np.amin(UWMTS_Num_Codebook_Use) < env_parameter.min_use_per_cb_guaranteed:
+    elif np.amin(UWMTS_Num_Codebook_Use) < env_parameter.min_use_per_cb_guaranteed and is_training:
         It = np.argmin(UWMTS_Num_Codebook_Use)
     else:
         TSIndex = np.zeros(K);
@@ -83,7 +83,7 @@ def bandit_bw_selection(bandit_bw_para, action, env_parameter):
 #-------------------------------------------------------------------------
 # Bandit relay selection
 #------------------------------------------------------------------------- 
-def bandit_relay_selection(bandit_relay_para, state, action, env_parameter):
+def bandit_relay_selection(bandit_relay_para, state, action, env_parameter, is_training=True):
     K = env_parameter.K_relay;
     RateNor = env_parameter.RateNor;
     UE_ID = action.UE_ID_BS2UE_Link;
@@ -94,7 +94,7 @@ def bandit_relay_selection(bandit_relay_para, state, action, env_parameter):
         legible_arms[state.Tx_ID_D2D_Link] = -5
         legible_arms[state.Rx_ID_D2D_Link] = -5
         legible_arms = np.squeeze(np.where(legible_arms>=0))
-    if np.amin(WMTS_Num_Relay_Use[legible_arms]) < env_parameter.min_use_per_relay_guaranteed:
+    if np.amin(WMTS_Num_Relay_Use[legible_arms]) < env_parameter.min_use_per_relay_guaranteed and is_training:
         It = legible_arms[np.argmin(WMTS_Num_Relay_Use[legible_arms])]
         if state.Is_D2D_Link_Active:
             if It != state.Tx_ID_D2D_Link and It != state.Rx_ID_D2D_Link:

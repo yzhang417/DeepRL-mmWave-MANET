@@ -69,7 +69,7 @@ def evaluation_ckpt(actor_critic_net, env_parameter, slots, LOOP, \
                 state_list[scheme_id].n_BS2UE_Tracking = current_state_copy.n_BS2UE_Tracking
                 decision_making(ct, scheme_id, state_list, action_list, lastOutput_list,\
                                 bandit_bw_para_list, bandit_relay_para_list, scheme_setting_list, \
-                                env_list[scheme_id].env_parameter)
+                                env_list[scheme_id].env_parameter,False)
             else:
                 input_state = state_list[scheme_id].to_ndarray_normalized()
                 Vval, pi = actor_critic_net.forward(input_state)

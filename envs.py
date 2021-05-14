@@ -44,16 +44,16 @@ def env_init(Netw_topo_id):
         N_UE = 5; # Number of users 
         radius = np.array([15, 15, 25, 30, 30]);  # Distance between Tx and Rx
         angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
-        lambda_ratio = np.array([1, 1, 3, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.05, 0.75, 0.75]); # Average percentage of slots in blockage
+        lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.05, 0.75, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 3: 
-        workload = 1.2 * 1e9;                              # Total downlink data stream rate
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
-        radius = np.array([15, 15, 25, 30, 20]);  # Distance between Tx and Rx
-        angle =  np.array([5, 85, 45, 10, 70]);   # Angle between Tx and Rx
-        lambda_ratio = np.array([1, 1, 3, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.05, 0.75, 0.05]); # Average percentage of slots in blockage
+        radius = np.array([10, 10, 15, 25, 30]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
+        lambda_ratio = np.array([1, 3, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.0]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 4: 
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
@@ -920,6 +920,7 @@ class envs():
         
         # Estimated average delay (including delay occured by emptying the queues)
         est_delay_distribution = np.zeros_like(self.delay_dist)
+        est_delay_distribution = self.delay_dist
         est_delay_distribution = self.delay_dist + self.current_Queue_dist_by_delay
         
         return est_delay_distribution

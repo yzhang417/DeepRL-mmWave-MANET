@@ -10,7 +10,7 @@ import bandit_function as bf
 from heuristic_tracking_selection import heuristic_tracking_selection
 
 def decision_making(ct, scheme_id, state_list, action_list, lastOutput_list,\
-                    bandit_bw_para_list, bandit_relay_para_list, scheme_setting_list, env_parameter):
+                    bandit_bw_para_list, bandit_relay_para_list, scheme_setting_list, env_parameter, is_training=True):
     
     # Queue length
     Queue_length_copy = copy.deepcopy(state_list[scheme_id].Queue_length).astype(np.float64);
@@ -53,7 +53,7 @@ def decision_making(ct, scheme_id, state_list, action_list, lastOutput_list,\
     # Action on UE selection for BS2UE link
     # Minimum number of service for each user is guaranteed before user schedueling and tracking mechanism
     v = np.amin(n_BS2UE_copy);
-    if v < env_parameter.min_service_guaranteed:
+    if v < env_parameter.min_service_guaranteed and is_training:
         state_list[scheme_id].Is_Tracking = False
         UE_ID_BS2UE_link_Current = np.argmin(n_BS2UE_copy)
     elif state_list[scheme_id].Is_Tracking and operator.not_(state_list[scheme_id].Is_D2D_Link_Active): 
@@ -76,7 +76,7 @@ def decision_making(ct, scheme_id, state_list, action_list, lastOutput_list,\
             bf.bandit_relay_selection(bandit_relay_para_list[scheme_id],\
                                       state_list[scheme_id],\
                                       action_list[scheme_id],\
-                                      env_parameter);
+                                      env_parameter, is_training);
         if action_list[scheme_id].Relay_ID == action_list[scheme_id].UE_ID_BS2UE_Link:
             action_list[scheme_id].Is_D2D_Link_Activated_For_Next_Slot = False;
         else:
@@ -88,7 +88,7 @@ def decision_making(ct, scheme_id, state_list, action_list, lastOutput_list,\
     # Action on beamwidth selection
     if scheme_setting_list[scheme_id].Is_bandit_bw:
         action_list[scheme_id].BW_ID_BS2UE_Link, bandit_bw_para_list[scheme_id] = \
-        bf.bandit_bw_selection(bandit_bw_para_list[scheme_id],action_list[scheme_id],env_parameter);
+        bf.bandit_bw_selection(bandit_bw_para_list[scheme_id],action_list[scheme_id],env_parameter, is_training);
     else:
         action_list[scheme_id].BW_ID_BS2UE_Link = (ct % env_parameter.K_bw);
 
