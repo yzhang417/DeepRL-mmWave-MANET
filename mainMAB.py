@@ -51,7 +51,7 @@ def main():
     parser.add_argument('--training', default=True, type=int, help='enable training phase')
     parser.add_argument('--testing', default=False, type=int, help='enable testing phase')
     parser.add_argument('--cuda', default=0, type=int, help='use to enable available CUDA')
-    parser.add_argument('--Netw_topo_id', default=1, type=int, help='Id of network topology')
+    parser.add_argument('--Netw_topo_id', default=3, type=int, help='Id of network topology')
     parser.add_argument('--output', default=None, help='output folder of training results')
     # Training process
     parser.add_argument('--iterations', default=240, type=int, help='number of episodes')
@@ -112,8 +112,9 @@ def main():
     evolution_rate_ckpt_MAB = [list() for _ in range(N_schemes)] # Evolution of average data rate at each checking point for Slots time slots
     evolution_delay_ckpt_MAB = [list() for _ in range(N_schemes)] # Evolution of average delay at each checking point for Slots time slots
     evolution_ratio_blockage_ckpt_MAB = [list() for _ in range(N_schemes)] # Evolution of ratio under blocakge at each checking point for Slots time slots
-    Queue_Eval_MAB = np.zeros((200,slots_monitored,env_parameter.N_UE,N_schemes));
-    Delay_dist_Eval_MAB = np.zeros((200,slots_monitored+1,env_parameter.N_UE,N_schemes));
+    eval_loops_final = 20;
+    Queue_Eval_MAB = np.zeros((eval_loops_final,slots_monitored,env_parameter.N_UE,N_schemes));
+    Delay_dist_Eval_MAB = np.zeros((eval_loops_final,slots_monitored+1,env_parameter.N_UE,N_schemes));
     Ave_num_using_relay_detailed_MAB = np.zeros((env_parameter.N_UE,env_parameter.N_UE,N_schemes));
     Ave_num_bw_selection_detailed_MAB = np.zeros((env_parameter.N_UE,env_parameter.K_bw,N_schemes));
     Ave_num_doing_tracking_detailed_MAB = np.zeros((env_parameter.N_UE,N_schemes));
@@ -142,8 +143,10 @@ def main():
     #-----------------------------------------------------------
     # Random seed
     #-----------------------------------------------------------
-    random.seed(13579)     # random seeds for reproducation
-    np.random.seed(246810) # random seeds for reproducation
+    #random.seed(13579)     # random seeds for reproducation
+    #np.random.seed(246810) # random seeds for reproducation
+    random.seed()     # random seeds
+    np.random.seed() # random seeds
         
     #----------------------------------------------
     # Training MAB-based scheduler
@@ -217,10 +220,21 @@ def main():
                                   env_list[scheme_id].env_parameter);
         
         # Evaluation at the check point
-        if (((ct+1) % (eval_ites*slots_monitored) == 0) or ct == slots_training-1):
+###################################################################################
+# Code for uniform check point program
+#         if (((ct+1) % (eval_ites*slots_monitored) == 0) or ct == slots_training-1):
+#             ite = int((ct+1)/slots_monitored) - 1
+#             if ct == slots_training-1: 
+#                 eval_loops = 200
+# Code for costomized check point
+        costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])-1;
+        costomized_check_point_ct = ((costomized_check_point+1) * slots_monitored) - 1;
+        costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])-1
+        if ct in costomized_check_point_ct.tolist():
             ite = int((ct+1)/slots_monitored) - 1
-            if ct == slots_training-1: 
-                eval_loops = 200
+            if ct == slots_training-1:
+                eval_loops = eval_loops_final
+###################################################################################    
             for scheme_id in range(N_schemes):
                 sys.stdout.write("\n----------------------------------------\n")
                 sys.stdout.write("Evaluation starts for scheme %d \n" % scheme_setting_list[scheme_id].scheme_id)

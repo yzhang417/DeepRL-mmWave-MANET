@@ -205,10 +205,16 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
         scheduler.step()
         
         # Evaluation at checkpoint
-        if ((ite+1) % eval_ites == 0 and ite > 0) or ite == iterations-1:
-            # Evaluating the result
-            if ite == iterations-1: 
-                eval_loops = 200
+###################################################################################
+# Code for uniform check point program
+#         if ((ite+1) % eval_ites == 0 and ite > 0) or ite == iterations-1:
+#             # Evaluating the result
+#             if ite == iterations-1: 
+#                 eval_loops = 200
+# Code for costomized check point
+        costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])-1
+        if ite in costomized_check_point.tolist():
+###################################################################################                
             t_Eval_start = time.time()
             sys.stdout.write("\n----------------------------------------\n")
             sys.stdout.write("Evaluation starts\n")

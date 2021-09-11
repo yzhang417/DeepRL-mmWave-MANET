@@ -36,7 +36,7 @@ def main():
     parser.add_argument('--testing', default=False, type=int, help='enable testing phase')
     parser.add_argument('--cuda', default=0, type=int, help='use to enable available CUDA')
     parser.add_argument('--cudaid', default=0, type=int, help='id of CUDA')
-    parser.add_argument('--Netw_topo_id', default=1, type=int, help='Id of network topology')
+    parser.add_argument('--Netw_topo_id', default=3, type=int, help='Id of network topology')
     parser.add_argument('--output', default=None, help='output folder of training results')
     # Training process
     parser.add_argument('--iterations', default=240, type=int, help='number of episodes')
@@ -95,8 +95,8 @@ def main():
     #-----------------------------------------------------------
     #random.seed(13579)     # random seeds for reproducation
     #np.random.seed(246810) # random seeds for reproducation
-    random.seed()     # random seeds for reproducation
-    np.random.seed() # random seeds for reproducation
+    random.seed()     # random seeds
+    np.random.seed() # random seeds
     
     #-----------------------------------------------------------
     # Training
@@ -166,15 +166,15 @@ def main():
             'evolution_reward': evolution_reward,
             'evolution_rate_ckpt': evolution_rate_ckpt,
             'evolution_delay_ckpt': evolution_delay_ckpt,
-            'evolution_ratio_blockage_ckpt': evolution_ratio_blockage_ckpt,
-            'Queue_Eval': Queue_Eval,
-            'Delay_dist_Eval': Delay_dist_Eval,
-            'Ave_num_using_relay_detailed': Ave_num_using_relay_detailed,
-            'Ave_num_bw_selection_detailed': Ave_num_bw_selection_detailed,
-            'Ave_num_doing_tracking_detailed': Ave_num_doing_tracking_detailed,
-            'Ave_ratio_under_blockage_detailed': Ave_ratio_under_blockage_detailed,
-            'model': actor_critic_net,
-            'model_state_dict': actor_critic_net.state_dict()
+            'evolution_ratio_blockage_ckpt': evolution_ratio_blockage_ckpt
+            #'Queue_Eval': Queue_Eval, #Comment to save memory
+            #'Delay_dist_Eval': Delay_dist_Eval,
+            #'Ave_num_using_relay_detailed': Ave_num_using_relay_detailed,
+            #'Ave_num_bw_selection_detailed': Ave_num_bw_selection_detailed,
+            #'Ave_num_doing_tracking_detailed': Ave_num_doing_tracking_detailed,
+            #'Ave_ratio_under_blockage_detailed': Ave_ratio_under_blockage_detailed,
+            #'model': actor_critic_net,
+            #'model_state_dict': actor_critic_net.state_dict()
         }
         outfile = open(training_results_filename,'wb')
         pickle.dump(training_results_dict, outfile)
