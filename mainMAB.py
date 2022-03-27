@@ -60,6 +60,7 @@ def main():
     parser.add_argument('--eval_ites', default=1, type=int, help='number of iterations before each ckpt evaluation')
     parser.add_argument('--clip_queues', default=False, type=int, help='clip the queue at the end of each iteration')
     parser.add_argument('--loading_DRL', default=False, type=int, help='load the trained DRL')
+    parser.add_argument('--Eval_At_Customized_Points', default=True, type=int, help='evaluate at customized checkpoint')
     #Print args
     args = parser.parse_args()
     for item in vars(args):
@@ -112,7 +113,7 @@ def main():
     evolution_rate_ckpt_MAB = [list() for _ in range(N_schemes)] # Evolution of average data rate at each checking point for Slots time slots
     evolution_delay_ckpt_MAB = [list() for _ in range(N_schemes)] # Evolution of average delay at each checking point for Slots time slots
     evolution_ratio_blockage_ckpt_MAB = [list() for _ in range(N_schemes)] # Evolution of ratio under blocakge at each checking point for Slots time slots
-    eval_loops_final = 20;
+    eval_loops_final = 200;
     Queue_Eval_MAB = np.zeros((eval_loops_final,slots_monitored,env_parameter.N_UE,N_schemes));
     Delay_dist_Eval_MAB = np.zeros((eval_loops_final,slots_monitored+1,env_parameter.N_UE,N_schemes));
     Ave_num_using_relay_detailed_MAB = np.zeros((env_parameter.N_UE,env_parameter.N_UE,N_schemes));
@@ -220,21 +221,23 @@ def main():
                                   env_list[scheme_id].env_parameter);
         
         # Evaluation at the check point
-###################################################################################
-# Code for uniform check point program
-#         if (((ct+1) % (eval_ites*slots_monitored) == 0) or ct == slots_training-1):
-#             ite = int((ct+1)/slots_monitored) - 1
-#             if ct == slots_training-1: 
-#                 eval_loops = 200
-# Code for costomized check point
-        costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])-1;
-        costomized_check_point_ct = ((costomized_check_point+1) * slots_monitored) - 1;
-        costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])-1
-        if ct in costomized_check_point_ct.tolist():
+        # Evaluation at checkpoint
+        To_Evaluate = False;
+        if args.Eval_At_Customized_Points:
+            costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])-1;
+            costomized_check_point_ct = ((costomized_check_point+1) * slots_monitored) - 1;
+            if ct in costomized_check_point_ct.tolist():      
+                To_Evaluate = True;
+        else:
+            if (((ct+1) % (eval_ites*slots_monitored) == 0) or ct == slots_training-1):
+                To_Evaluate = True;
+        # To Evaluate the selected checkpoint                
+        if To_Evaluate == True:
+            To_Evaluate = False;
             ite = int((ct+1)/slots_monitored) - 1
             if ct == slots_training-1:
                 eval_loops = eval_loops_final
-###################################################################################    
+                
             for scheme_id in range(N_schemes):
                 sys.stdout.write("\n----------------------------------------\n")
                 sys.stdout.write("Evaluation starts for scheme %d \n" % scheme_setting_list[scheme_id].scheme_id)

@@ -23,7 +23,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
              batches, slots, iterations, \
              gamma, lambd, value_coeff, entropy_coeff, \
              clip_param, decaying_clip_param, clipping_critic,\
-             eval_loops, eval_ites, device, clip_queues):
+             eval_loops, eval_ites, device, clip_queues, Eval_At_Customized_Points):
     # print option
     np.set_printoptions(suppress=True)
     np.set_printoptions(precision=2)
@@ -49,7 +49,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
     for ite in range(iterations):
         
         # Code Profiler
-        profiling_code = True
+        profiling_code = False
         if profiling_code and ite == 0:
             pr = cProfile.Profile()
             pr.enable()
@@ -86,7 +86,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             pi_dist = pi.detach().cpu().numpy()
             action, action_ndarray, action_chosen_index = choose_action(pi_dist, env.env_parameter) 
             # Sanity check of action
-            action_sanity_check(slot, action, state)            
+            #action_sanity_check(slot, action, state)            
             
             # Calculate the ratio (prob(current pi) / prob(old pi))
             logProb = torch.log(pi.squeeze(0)[action_chosen_index])
@@ -205,16 +205,19 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
         scheduler.step()
         
         # Evaluation at checkpoint
-###################################################################################
-# Code for uniform check point program
-#         if ((ite+1) % eval_ites == 0 and ite > 0) or ite == iterations-1:
-#             # Evaluating the result
-#             if ite == iterations-1: 
-#                 eval_loops = 200
-# Code for costomized check point
-        costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])-1
-        if ite in costomized_check_point.tolist():
-###################################################################################                
+        To_Evaluate = False;
+        if Eval_At_Customized_Points:
+            costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])-1;
+            if ite in costomized_check_point.tolist():
+                To_Evaluate = True
+        else:
+            if ((ite+1) % eval_ites == 0 and ite > 0) or ite == iterations-1:
+                To_Evaluate = True
+                if ite == iterations-1: 
+                    eval_loops = 200
+        # To Evaluate the selected checkpoint
+        if To_Evaluate == True:
+            To_Evaluate = False;
             t_Eval_start = time.time()
             sys.stdout.write("\n----------------------------------------\n")
             sys.stdout.write("Evaluation starts\n")

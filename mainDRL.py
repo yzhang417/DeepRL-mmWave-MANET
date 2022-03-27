@@ -38,6 +38,7 @@ def main():
     parser.add_argument('--cudaid', default=0, type=int, help='id of CUDA')
     parser.add_argument('--Netw_topo_id', default=3, type=int, help='Id of network topology')
     parser.add_argument('--output', default=None, help='output folder of training results')
+    parser.add_argument('--save_memory', default=0, help='save memory')
     # Training process
     parser.add_argument('--iterations', default=240, type=int, help='number of episodes')
     parser.add_argument('--slots', default=1500, type=int, help='number of slots in a single episode')
@@ -59,7 +60,8 @@ def main():
     parser.add_argument('--value_coeff', default=0.5, type=float, help='value loss coeffecient')
     parser.add_argument('--entropy_coeff', default=0.05, type=float, help='entropy loss coefficient')
     parser.add_argument('--decaying_clip_param', default=0, type=int, help='Whether to decay the clipping parameter')
-    parser.add_argument('--clipping_critic', default=1, type=int, help='Whether to clip the critic')    
+    parser.add_argument('--clipping_critic', default=1, type=int, help='Whether to clip the critic')  
+    parser.add_argument('--Eval_At_Customized_Points', default=True, type=int, help='evaluate at customized checkpoint')
     #Print args
     args = parser.parse_args()
     for item in vars(args):
@@ -136,6 +138,7 @@ def main():
         decaying_clip_param = args.decaying_clip_param
         clipping_critic = args.clipping_critic
         clip_queues = args.clip_queues
+        Eval_At_Customized_Points = args.Eval_At_Customized_Points
         
         # Training
         print('\n------------------------------------------------------')
@@ -147,7 +150,7 @@ def main():
         training(env, actor_critic_net, optimizer, scheduler, batches, slots, iterations,\
                  gamma, lambd, value_coeff, entropy_coeff,\
                  clip_param, decaying_clip_param, clipping_critic,\
-                 eval_loops, eval_ites, device, clip_queues)
+                 eval_loops, eval_ites, device, clip_queues, Eval_At_Customized_Points)
         
         # Save the trained model result
         trained_model_filename = output_folder+'trained_model_DRL_netwTopo'+str(Netw_topo_id)+'.pt'
@@ -159,23 +162,35 @@ def main():
         # Save all variable
         args_DRL = args
         training_results_filename = output_folder+'training_results_DRL_netwTopo'+str(Netw_topo_id)+'.pt'
-        training_results_dict = {
-            'args_DRL': args_DRL,
-            'env_parameter': env_parameter,
-            'evolution_queue_length': evolution_queue_length,
-            'evolution_reward': evolution_reward,
-            'evolution_rate_ckpt': evolution_rate_ckpt,
-            'evolution_delay_ckpt': evolution_delay_ckpt,
-            'evolution_ratio_blockage_ckpt': evolution_ratio_blockage_ckpt
-            #'Queue_Eval': Queue_Eval, #Comment to save memory
-            #'Delay_dist_Eval': Delay_dist_Eval,
-            #'Ave_num_using_relay_detailed': Ave_num_using_relay_detailed,
-            #'Ave_num_bw_selection_detailed': Ave_num_bw_selection_detailed,
-            #'Ave_num_doing_tracking_detailed': Ave_num_doing_tracking_detailed,
-            #'Ave_ratio_under_blockage_detailed': Ave_ratio_under_blockage_detailed,
-            #'model': actor_critic_net,
-            #'model_state_dict': actor_critic_net.state_dict()
-        }
+        save_memory = 0;
+        if args.save_memory == 1:
+            training_results_dict = {
+                'args_DRL': args_DRL,
+                'env_parameter': env_parameter,
+                'evolution_queue_length': evolution_queue_length,
+                'evolution_reward': evolution_reward,
+                'evolution_rate_ckpt': evolution_rate_ckpt,
+                'evolution_delay_ckpt': evolution_delay_ckpt,
+                'evolution_ratio_blockage_ckpt': evolution_ratio_blockage_ckpt
+            }
+        else:
+            training_results_dict = {
+                'args_DRL': args_DRL,
+                'env_parameter': env_parameter,
+                'evolution_queue_length': evolution_queue_length,
+                'evolution_reward': evolution_reward,
+                'evolution_rate_ckpt': evolution_rate_ckpt,
+                'evolution_delay_ckpt': evolution_delay_ckpt,
+                'evolution_ratio_blockage_ckpt': evolution_ratio_blockage_ckpt,
+                'Queue_Eval': Queue_Eval,
+                'Delay_dist_Eval': Delay_dist_Eval,
+                'Ave_num_using_relay_detailed': Ave_num_using_relay_detailed,
+                'Ave_num_bw_selection_detailed': Ave_num_bw_selection_detailed,
+                'Ave_num_doing_tracking_detailed': Ave_num_doing_tracking_detailed,
+                'Ave_ratio_under_blockage_detailed': Ave_ratio_under_blockage_detailed,
+                'model': actor_critic_net,
+                'model_state_dict': actor_critic_net.state_dict()
+            }
         outfile = open(training_results_filename,'wb')
         pickle.dump(training_results_dict, outfile)
         outfile.close()
@@ -194,11 +209,11 @@ def main():
         print('Starting Testing')
         print('-------------------------------------------------------')
         # Load saved variable and print parameters
-        training_results_filename = output_folder+'/training_results_DRL_netwTopo'+str(Netw_topo_id)+'.pt'
+        training_results_filename = output_folder+'training_results_DRL_netwTopo'+str(Netw_topo_id)+'.pt'
         infile = open(training_results_filename,'rb')
         training_results_dict = pickle.load(infile)
         infile.close()
-        print(training_results_dict['args'])
+        print(training_results_dict['args_DRL'])
         
         # Plot training/testing results
         evolution_queue_length = training_results_dict['evolution_queue_length']
@@ -206,8 +221,14 @@ def main():
         evolution_rate_ckpt = training_results_dict['evolution_rate_ckpt']  
         evolution_delay_ckpt = training_results_dict['evolution_delay_ckpt']
         evolution_ratio_blockage_ckpt = training_results_dict['evolution_ratio_blockage_ckpt']
-        Queue_Eval = training_results_dict['Queue_Eval']
-        Delay_dist_Eval = training_results_dict['Delay_dist_Eval']
+        try:
+            Queue_Eval = training_results_dict['Queue_Eval']
+        except:
+            Queue_Eval = []
+        try:
+            Delay_dist_Eval = training_results_dict['Delay_dist_Eval']
+        except:
+            Delay_dist_Eval = []
         show_plot = False
         plot_training_testing_result(evolution_queue_length, evolution_reward, evolution_rate_ckpt, evolution_delay_ckpt,\
                                      evolution_ratio_blockage_ckpt, Queue_Eval, Delay_dist_Eval, \

@@ -32,28 +32,28 @@ def env_init(Netw_topo_id):
     # Network topology
     # -------------------------------------    
     if Netw_topo_id == 1:
-        workload = 1.0 * 1e9;                              # Total downlink data stream rate
+        workload = 3.5 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
-        radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
-        angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
-        lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
+        radius = np.array([10, 10, 15, 25, 30]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
+        lambda_ratio = np.array([0, 10, 0, 0, 0]); # Ratio of arrival rate
         target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 2:
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
-        radius = np.array([15, 15, 25, 30, 30]);  # Distance between Tx and Rx
+        radius = np.array([10, 10, 15, 25, 30]);  # Distance between Tx and Rx
         angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
-        lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.05, 0.75, 0.05]); # Average percentage of slots in blockage
+        lambda_ratio = np.array([1, 100, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
-    if Netw_topo_id == 3: 
+    if Netw_topo_id == 3:  # Scenario presented in the paper
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
         radius = np.array([10, 10, 15, 25, 30]);  # Distance between Tx and Rx
         angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
         lambda_ratio = np.array([1, 3, 1, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.0]); # Average percentage of slots in blockage
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 4: 
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
@@ -346,6 +346,7 @@ class envs():
         self.current_Queue_dist_by_delay = np.zeros((slots_monitored+1,env_parameter.N_UE),dtype=int)
         self.delay_dist = np.zeros((slots_monitored+1,env_parameter.N_UE),dtype=int)
         self.is_in_blockage = np.zeros((env_parameter.N_UE,env_parameter.N_UE),dtype=int)
+        self.couting_tracking_slots = 0
 
     # -------------------------------------    
     # Reset enviroment
@@ -381,6 +382,7 @@ class envs():
         self.current_Queue_dist_by_delay[1,:] = self.npkts_arrival # Initial packets have delay of 1 slot
         initial_state = def_state(self.env_parameter)
         initial_state.Queue_length = self.Queue[self.ct,:]
+        self.couting_tracking_slots = 0
         return initial_state
         
     # -------------------------------------
@@ -519,6 +521,13 @@ class envs():
         state.Rx_ID_D2D_Link = action.UE_ID_BS2UE_Link
         state.Is_Tracking = action.Is_Tracking_Required_For_Next_Slot
         state.UE_ID_BS2UE_Link_Last_Slot = action.UE_ID_BS2UE_Link
+#         # Avoid continuing tracking
+#         if state.Is_Tracking == True:
+#             self.couting_tracking_slots += 1
+#         else:
+#             self.couting_tracking_slots = 0
+#         if self.couting_tracking_slots == 10 and reward < 0.01:
+#             state.Is_Tracking == False;
         
         # Update the blocakge scenario        
         self.num_slots_to_last_blockage_starts += 1        
@@ -686,7 +695,8 @@ class envs():
             is_in_blockage = np.zeros_like(self.remain_slots_in_blockage)
             self.remain_slots_in_blockage.clip(max=1,out=is_in_blockage)     
             self.is_in_blockage = is_in_blockage
-            blockage_loss_dB = is_in_blockage * self.env_parameter.blockage_loss_dB
+            ##blockage_loss_dB = is_in_blockage * self.env_parameter.blockage_loss_dB
+            blockage_loss_dB = is_in_blockage * np.random.uniform(low=10,high=30,size=1);
             Pathloss = 28.0 + 22*np.log10(dist_D2D) + 20*np.log10(self.env_parameter.fc) + blockage_loss_dB; 
             self.env_parameter.Pathloss = Pathloss
             self.num_slots_to_last_blockage_starts = self.num_slots_to_last_blockage_starts * \

@@ -17,7 +17,7 @@ from get_MAB_scheme_setting import *
 #-------------------------------------------------------------------------
 # Arg parser
 parser = argparse.ArgumentParser(formatter_class=argparse.ArgumentDefaultsHelpFormatter)
-parser.add_argument('--Netw_topo_id', default=1, type=int, help='Id of network topology')
+parser.add_argument('--Netw_topo_id', default=3, type=int, help='Id of network topology')
 parser.add_argument('--output', default=None, help='output folder of training results')
 args = parser.parse_args()
 if args.output is not None:
@@ -32,17 +32,17 @@ Netw_topo_id = args.Netw_topo_id
 # Plot settings
 plt.rcParams.update({'font.size': 18})
 plt.rcParams.update({'axes.labelsize': 18})
-plt.rcParams.update({'legend.fontsize': 12})
+plt.rcParams.update({'legend.fontsize': 13})
 plt.rcParams.update({'legend.loc': 'best'})
 plt.rcParams.update({'figure.autolayout': True})
 plt.rcParams['lines.linewidth'] = 2.5
-
+plt.rcParams["legend.framealpha"] = 0.85
 
 #-------------------------------------------------------------------------
 # Load saved variables and print parameters
 #-------------------------------------------------------------------------
 # DRL results
-training_results_DRL_filename = output_folder+'/training_results_DRL_netwTopo'+str(Netw_topo_id)+'.pt'
+training_results_DRL_filename = output_folder+'training_results_DRL_netwTopo'+str(Netw_topo_id)+'.pt'
 infile_DRL = open(training_results_DRL_filename,'rb')
 training_results_DRL_dict = pickle.load(infile_DRL)
 infile_DRL.close()
@@ -50,7 +50,7 @@ locals().update(training_results_DRL_dict)
 print(args_DRL)
 
 # MAB results
-training_results_MAB_filename = output_folder+'/training_results_MAB_netwTopo'+str(Netw_topo_id)+'.pt'
+training_results_MAB_filename = output_folder+'training_results_MAB_netwTopo'+str(Netw_topo_id)+'.pt'
 infile_MAB = open(training_results_MAB_filename,'rb')
 training_results_MAB_dict = pickle.load(infile_MAB)
 infile_MAB.close()
@@ -61,76 +61,78 @@ if args_DRL.slots != args_MAB.slots:
     print('\n !!!WARNING!!!: MAB and DRL have different number of slots in an iteration\n')
 if args_DRL.eval_ites != args_MAB.eval_ites:
     print('\n !!!WARNING!!!: MAB and DRL have different frequencies of CKPTs\n')
-    
-#----------------------------------------------------------------
-# Results from training phase
-#----------------------------------------------------------------
+
 # Complementary parameters
 scheme_setting_list = get_MAB_scheme_setting()
 N_schemes = len(scheme_setting_list)    
 eval_ites_MAB = args_MAB.eval_ites
 eval_ites_DRL = args_DRL.eval_ites
+    
 
+#----------------------------------------------------------------
+# Results from training phase
+#----------------------------------------------------------------
 # Queue length evolution of a single shot training realization
 figID = 2
 plt.figure(num=figID,figsize=(10,6),dpi=1200)
-#plt.title('Evolution of queue length during the training process')
+plt.title('Evolution of queue length during the training process')
 evolution_queue_length_MAB.append(evolution_queue_length)
 evolution_queue_length = evolution_queue_length_MAB
 slots_to_show = 1500 * 240
-for scheme_id in range(N_schemes):
+#for scheme_id in range(N_schemes):
+for scheme_id in [7]:
     plt.plot(range(len(evolution_queue_length[scheme_id][0:slots_to_show])),evolution_queue_length[scheme_id][0:slots_to_show],\
              label=scheme_setting_list[scheme_id].legend,c=scheme_setting_list[scheme_id].color)
 plt.rcParams.update({'legend.loc': 'best'})
 plt.legend()
 plt.xlabel('Time slot index')
 plt.ylabel('Average queue length')
-ymax = 10*max(evolution_queue_length[6])
-plt.ylim(0, ymax)
-plt.savefig(output_folder+'Training_phase_evolution_queue_length_zoom.eps',\
-            format='eps', facecolor='w', transparent=False)
+#ymax = 10*max(evolution_queue_length[-2])
+#plt.ylim(0, ymax)
+plt.savefig(output_folder+'Training_phase_evolution_queue_length_zoom.pdf',\
+            format='pdf', facecolor='w', transparent=True)
 
+# Queue length evolution of a single shot training realization
 figID += 1
 plt.figure(num=figID,figsize=(10,6),dpi=1200)
-#plt.title('Evolution of queue length during the training process')
-evolution_queue_length_MAB.append(evolution_queue_length)
-evolution_queue_length = evolution_queue_length_MAB
-for scheme_id in range(N_schemes):
+plt.title('Evolution of queue length during the training process')
+#for scheme_id in range(N_schemes):
+for scheme_id in [7]:
     plt.plot(range(len(evolution_queue_length[scheme_id])),evolution_queue_length[scheme_id],\
              label=scheme_setting_list[scheme_id].legend,c=scheme_setting_list[scheme_id].color)
 plt.rcParams.update({'legend.loc': 'best'})
 plt.legend()
 plt.xlabel('Time slot index')
 plt.ylabel('Average queue length')
-ymax = 10*max(evolution_queue_length[7])
+ymax = 10*max(evolution_queue_length[-1])
 plt.ylim(0, ymax)
-plt.savefig(output_folder+'Training_phase_evolution_queue_length.eps',\
-            format='eps', facecolor='w', transparent=False)
+plt.savefig(output_folder+'Training_phase_evolution_queue_length.pdf',\
+            format='pdf', facecolor='w', transparent=True)
 
 # Reward evolution of a single shot training realization
-# figID += 1
-# plt.figure(num=figID,figsize=(10,6),dpi=1200)
-# #plt.title('Evolution of reward during training process')
-# evolution_reward_MAB.append(evolution_reward)
-# evolution_reward = evolution_reward_MAB
-# for scheme_id in range(N_schemes):
-#     plt.plot(range(len(evolution_reward[scheme_id])),evolution_reward[scheme_id],\
-#              label=scheme_setting_list[scheme_id].legend,c=scheme_setting_list[scheme_id].color)
-# plt.rcParams.update({'legend.loc': 'lower right'})
-# plt.legend()
-# plt.xlabel('Time slot index');
-# plt.ylabel('Reward');
-# plt.savefig(output_folder+'Training_phase_evolution_reward.eps',\
-#             format='eps', facecolor='w', transparent=False)
+figID += 1
+plt.figure(num=figID,figsize=(10,6),dpi=1200)
+plt.title('Evolution of reward during training process')
+evolution_reward_MAB.append(evolution_reward)
+evolution_reward = evolution_reward_MAB
+for scheme_id in range(N_schemes):
+    plt.plot(range(len(evolution_reward[scheme_id])),evolution_reward[scheme_id],\
+             label=scheme_setting_list[scheme_id].legend,c=scheme_setting_list[scheme_id].color)
+plt.rcParams.update({'legend.loc': 'lower right'})
+plt.legend()
+plt.xlabel('Time slot index');
+plt.ylabel('Reward');
+plt.savefig(output_folder+'Training_phase_evolution_reward.pdf',\
+            format='pdf', facecolor='w', transparent=True)
 
 # Average data rate at each check point
 ite_duration = args_DRL.slots * env_parameter.t_slot
 figID += 1
 plt.figure(num=figID,figsize=(10,6),dpi=1200)
-#plt.title('Evolution of data rate evaluated at each checkpoint')
 evolution_rate_ckpt_MAB.append(evolution_rate_ckpt)
 evolution_rate_ckpt = evolution_rate_ckpt_MAB
-for scheme_id in range(N_schemes):
+#for scheme_id in range(N_schemes):
+for scheme_id in [0,3,4,6,7]:
     if scheme_id == N_schemes - 1:
         eval_ites = eval_ites_DRL
     else:
@@ -142,17 +144,16 @@ for scheme_id in range(N_schemes):
 plt.rcParams.update({'legend.loc': 'lower right'})
 plt.legend()
 plt.xlabel('Training iteration (one iteration is %d seconds)' %ite_duration)
-plt.ylabel('Data rate (Gbits/s)');
-plt.savefig(output_folder+'Training_phase_evolution_rate_ckpt.eps',format='eps', facecolor='w', transparent=False)
+plt.ylabel('Data rate (Gbits/s)')
+#plt.title('Evolution of data rate evaluated at each checkpoint')
+plt.savefig(output_folder+'Training_phase_evolution_rate_ckpt.pdf',format='pdf', facecolor='w', transparent=True)
 
 # Average delay at each check point
 figID += 1
 plt.figure(num=figID,figsize=(10,6),dpi=1200)
-#plt.title('Evolution of average delay evaluated at each checkpoint')
 evolution_delay_ckpt_MAB.append(evolution_delay_ckpt)
 evolution_delay_ckpt = evolution_delay_ckpt_MAB
-#for scheme_id in range(N_schemes):
-for scheme_id in [4,6,7]:
+for scheme_id in [0,3,4,6,7]:
     if scheme_id == N_schemes - 1:
         eval_ites = eval_ites_DRL
     else:
@@ -160,22 +161,21 @@ for scheme_id in [4,6,7]:
     plt.plot(range(1*eval_ites,len(evolution_delay_ckpt[scheme_id])*eval_ites+1,eval_ites),\
              evolution_delay_ckpt[scheme_id],\
              label=scheme_setting_list[scheme_id].legend,\
-             c=scheme_setting_list[scheme_id].color)
+             c=scheme_setting_list[scheme_id].color)    
 plt.rcParams.update({'legend.loc': 'upper right'})
 plt.legend()
 plt.xlabel('Training iteration (one iteration is %d seconds)' %ite_duration)
-plt.ylabel('Delay in slots');
-plt.savefig(output_folder+'Training_phase_evolution_delay_ckpt.eps',format='eps', facecolor='w', transparent=False)
+plt.ylabel('Delay in slots')
+#plt.title('Evolution of average delay evaluated at each checkpoint')
+plt.savefig(output_folder+'Training_phase_evolution_delay_ckpt.pdf',format='pdf', facecolor='w', transparent=True)
 
 # Average blockage probability at each check point
 figID += 1
 plt.figure(num=figID,figsize=(10,6),dpi=1200)
-#plt.title('Evolution of percentage of time under blockage evaluated at each checkpoint')
 evolution_ratio_blockage_ckpt_MAB.append(evolution_ratio_blockage_ckpt)
 evolution_ratio_blockage_ckpt = evolution_ratio_blockage_ckpt_MAB
-
 #for scheme_id in range(N_schemes):
-for scheme_id in [4,6,7]:
+for scheme_id in [0,3,4,6,7]:
     if scheme_id == N_schemes - 1:
         eval_ites = eval_ites_DRL
     else:
@@ -184,12 +184,12 @@ for scheme_id in [4,6,7]:
              np.divide(evolution_ratio_blockage_ckpt[scheme_id],args_DRL.slots),\
              label=scheme_setting_list[scheme_id].legend,\
              c=scheme_setting_list[scheme_id].color)
-
-plt.rcParams.update({'legend.loc': 'best'})
-plt.legend()
+plt.legend(loc='upper left',bbox_to_anchor=(0.1,0.53))
 plt.xlabel('Training iteration (one iteration is %d seconds)' %ite_duration)
-plt.ylabel('Percentage of time under blockage')
-plt.savefig(output_folder+'Training_phase_evolution_ratio_blockage_ckpt.eps',format='eps', facecolor='w', transparent=False)
+plt.ylabel('Percentage of time that main link has blockage loss', fontsize=14)
+#plt.title('Evolution of percentage of time under blockage evaluated at each checkpoint')
+plt.savefig(output_folder+'Training_phase_evolution_ratio_blockage_ckpt.pdf',format='pdf', facecolor='w', transparent=True)
+
 
 #----------------------------------------------------------------------------
 # Testing results of final evaluation, namely running limited number of slots
@@ -204,13 +204,11 @@ ave_Delay_dist = np.append(ave_Delay_dist_MAB, ave_Delay_dist, axis = 1);
 ave_Delay_CDF = np.cumsum(ave_Delay_dist,axis=0);
 figID += 1
 plt.figure(num=figID,figsize=(10,6),dpi=1200)
-#plt.title('CDF of delay (slots)')
 slots = args_DRL.slots
 max_delay_to_show = slots+1
 max_delay_to_show = 100
 max_delay_to_show = min(max_delay_to_show,slots+1)
 for scheme_id in [6,7]:
-    #if N_schemes - scheme_id <= 3: 
     plt.plot(range(max_delay_to_show),ave_Delay_CDF[0:max_delay_to_show,scheme_id],\
              label=scheme_setting_list[scheme_id].legend,\
              c=scheme_setting_list[scheme_id].color)
@@ -218,7 +216,8 @@ plt.rcParams.update({'legend.loc': 'lower right'})
 plt.legend()
 plt.xlabel('Average delay (in slots)')
 plt.ylabel('Prob (delay <= t)')
-plt.savefig(output_folder+'Testing_phase_CDF_delay.eps',format='eps', facecolor='w', transparent=False)
+#plt.title('CDF of delay (slots)')
+plt.savefig(output_folder+'Testing_phase_CDF_delay.pdf',format='pdf', facecolor='w', transparent=True)
 
 # Evolution of queue length distribution
 mean_queue_length = np.mean(np.mean(Queue_Eval,axis=2),axis=0);
@@ -227,9 +226,7 @@ mean_queue_length = np.expand_dims(mean_queue_length, axis=1);
 mean_queue_length = np.append(mean_queue_length_MAB, mean_queue_length, axis = 1);
 figID += 1
 plt.figure(num=figID,figsize=(10,6),dpi=1200)
-#plt.title('Averaged evolution of queue length')
 for scheme_id in [6,7]:
-    if N_schemes - scheme_id <= 3: 
         plt.plot(range(slots),mean_queue_length[:,scheme_id],\
                  label=scheme_setting_list[scheme_id].legend,\
                  c=scheme_setting_list[scheme_id].color)
@@ -237,7 +234,8 @@ plt.rcParams.update({'legend.loc': 'lower right'})
 plt.legend()
 plt.xlabel('Time slot index')
 plt.ylabel('Average queue length')
-plt.savefig(output_folder+'Testing_phase_evolution_queue_length.eps',format='eps', facecolor='w', transparent=False)
+#plt.title('Averaged evolution of queue length')
+plt.savefig(output_folder+'Testing_phase_evolution_queue_length.pdf',format='pdf', facecolor='w', transparent=True)
 
 # CDF of queue length
 # figID += 1
@@ -252,9 +250,8 @@ plt.savefig(output_folder+'Testing_phase_evolution_queue_length.eps',format='eps
 # plt.ylabel('Prob (queue length > q)')
 # plt.rcParams.update({'legend.loc': 'lower right'})
 # plt.legend()
-# plt.savefig(output_folder+'Testing_phase_CDF_queue_length.eps',format='eps', facecolor='w', transparent=False)
+# plt.savefig(output_folder+'Testing_phase_CDF_queue_length.pdf',format='pdf', facecolor='w', transparent=True)
 
-#sys.exit()
 # Bar plot of relay use per UE (3D)
 Ave_num_using_relay_detailed = np.expand_dims(Ave_num_using_relay_detailed, axis=2);
 Ave_num_using_relay_detailed = np.append(Ave_num_using_relay_detailed_MAB, Ave_num_using_relay_detailed, axis = 2);
@@ -275,7 +272,7 @@ plt.legend()
 plt.xticks(x, labels)
 plt.xlabel('UE index')
 plt.ylabel('Average number of use')
-plt.savefig(output_folder+'Analysis_relay_usages.eps',format='eps', facecolor='w', transparent=False)
+plt.savefig(output_folder+'Analysis_relay_usages.pdf',format='pdf', facecolor='w', transparent=True)
 
 # Bar plot of bw selection per UE (3D)
 Ave_num_bw_selection_detailed = np.expand_dims(Ave_num_bw_selection_detailed, axis=2);
@@ -294,12 +291,11 @@ plt.legend()
 plt.xticks(x, labels)
 plt.xlabel('UE index')
 plt.ylabel('Average number of use')
-plt.savefig(output_folder+'Analysis_codebook_usages.eps',format='eps', facecolor='w', transparent=False)
+plt.savefig(output_folder+'Analysis_codebook_usages.pdf',format='pdf', facecolor='w', transparent=True)
 
 # Bar plot of tracking use per UE (2D)
-#breakpoint()
-Ave_num_doing_tracking_detailed = np.expand_dims(Ave_num_doing_tracking_detailed, axis=1);
-Ave_num_doing_tracking_detailed = np.append(Ave_num_doing_tracking_detailed_MAB, Ave_num_doing_tracking_detailed, axis = 1);
+#Ave_num_doing_tracking_detailed = np.expand_dims(Ave_num_doing_tracking_detailed, axis=1);
+#Ave_num_doing_tracking_detailed = np.append(Ave_num_doing_tracking_detailed_MAB, Ave_num_doing_tracking_detailed, axis = 1);
 # figID += 1
 # plt.figure(num=figID,figsize=(10,6),dpi=1200)
 # #plt.title('Average number of use of different codebooks')
@@ -314,7 +310,7 @@ Ave_num_doing_tracking_detailed = np.append(Ave_num_doing_tracking_detailed_MAB,
 # plt.xticks(x, labels)
 # plt.xlabel('UE index')
 # plt.ylabel('Average number of use')
-# plt.savefig(output_folder+'Analysis_codebook_usages.eps',format='eps', facecolor='w', transparent=False)
+# plt.savefig(output_folder+'Analysis_codebook_usages.pdf',format='pdf', facecolor='w', transparent=True)
 
 # # Bar plot of under blocakge (2D)
 # Ave_ratio_under_blockage_detailed = np.expand_dims(Ave_ratio_under_blockage_detailed, axis=2);
