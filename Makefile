@@ -160,3 +160,70 @@ diffBatches:
 	python mainDRL.py --Netw_topo_id 3 --batches 50 --output study_batch/batch_size_50/realization_4
 
 
+train_net3:
+	python mainDRL.py --Netw_topo_id 33 --output train_process_net33/realization_0
+	python mainDRL.py --Netw_topo_id 33 --output train_process_net33/realization_1
+	python mainDRL.py --Netw_topo_id 33 --output train_process_net33/realization_2
+	python mainDRL.py --Netw_topo_id 33 --output train_process_net33/realization_3
+	python mainDRL.py --Netw_topo_id 33 --output train_process_net33/realization_4
+	python mainDRL.py --Netw_topo_id 33 --output train_process_net33/realization_5
+	python mainDRL.py --Netw_topo_id 33 --output train_process_net33/realization_6
+	python mainDRL.py --Netw_topo_id 33 --output train_process_net33/realization_7
+	python mainDRL.py --Netw_topo_id 33 --output train_process_net33/realization_8
+	python mainDRL.py --Netw_topo_id 33 --output train_process_net33/realization_9
+    
+train_net4:
+	python mainDRL.py --Netw_topo_id 4 --output train_process_net4/realization_0
+	python mainDRL.py --Netw_topo_id 4 --output train_process_net4/realization_1
+	python mainDRL.py --Netw_topo_id 4 --output train_process_net4/realization_2
+	python mainDRL.py --Netw_topo_id 4 --output train_process_net4/realization_3
+	python mainDRL.py --Netw_topo_id 4 --output train_process_net4/realization_4
+	python mainDRL.py --Netw_topo_id 4 --output train_process_net4/realization_5
+	python mainDRL.py --Netw_topo_id 4 --output train_process_net4/realization_6
+	python mainDRL.py --Netw_topo_id 4 --output train_process_net4/realization_7
+	python mainDRL.py --Netw_topo_id 4 --output train_process_net4/realization_8
+	python mainDRL.py --Netw_topo_id 5 --output train_process_net4/realization_9
+    
+train_net5:
+	python mainDRL.py --Netw_topo_id 5 --output train_process_net5/realization_0
+	python mainDRL.py --Netw_topo_id 5 --output train_process_net5/realization_1
+	python mainDRL.py --Netw_topo_id 5 --output train_process_net5/realization_2
+	python mainDRL.py --Netw_topo_id 5 --output train_process_net5/realization_3
+	python mainDRL.py --Netw_topo_id 5 --output train_process_net5/realization_4
+	python mainDRL.py --Netw_topo_id 5 --output train_process_net5/realization_5
+	python mainDRL.py --Netw_topo_id 5 --output train_process_net5/realization_6
+	python mainDRL.py --Netw_topo_id 5 --output train_process_net5/realization_7
+	python mainDRL.py --Netw_topo_id 5 --output train_process_net5/realization_8
+	python mainDRL.py --Netw_topo_id 5 --output train_process_net5/realization_9
+    
+train_net6:
+	python mainDRL.py --Netw_topo_id 6 --output train_process_net6/realization_0
+	python mainDRL.py --Netw_topo_id 6 --output train_process_net6/realization_1
+	python mainDRL.py --Netw_topo_id 6 --output train_process_net6/realization_2
+	python mainDRL.py --Netw_topo_id 6 --output train_process_net6/realization_3
+	python mainDRL.py --Netw_topo_id 6 --output train_process_net6/realization_4
+	python mainDRL.py --Netw_topo_id 6 --output train_process_net6/realization_5
+	python mainDRL.py --Netw_topo_id 6 --output train_process_net6/realization_6
+	python mainDRL.py --Netw_topo_id 6 --output train_process_net6/realization_7
+	python mainDRL.py --Netw_topo_id 6 --output train_process_net6/realization_8
+	python mainDRL.py --Netw_topo_id 6 --output train_process_net6/realization_9
+    
+train_net7:
+	python mainDRL.py --Netw_topo_id 7 --output train_process_net7/realization_0
+	python mainDRL.py --Netw_topo_id 7 --output train_process_net7/realization_1
+	python mainDRL.py --Netw_topo_id 7 --output train_process_net7/realization_2
+	python mainDRL.py --Netw_topo_id 7 --output train_process_net7/realization_3
+	python mainDRL.py --Netw_topo_id 7 --output train_process_net7/realization_4
+	python mainDRL.py --Netw_topo_id 7 --output train_process_net7/realization_5
+	python mainDRL.py --Netw_topo_id 7 --output train_process_net7/realization_6
+	python mainDRL.py --Netw_topo_id 7 --output train_process_net7/realization_7
+	python mainDRL.py --Netw_topo_id 7 --output train_process_net7/realization_8
+	python mainDRL.py --Netw_topo_id 7 --output train_process_net7/realization_9
+    
+    
+train_net1_changing:
+	python mainDRL.py --Netw_topo_id 10 --Eval_At_Customized_Points 0 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_0
+	python mainDRL.py --Netw_topo_id 10 --Eval_At_Customized_Points 0 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_1
+	python mainDRL.py --Netw_topo_id 10 --Eval_At_Customized_Points 0 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_2
+	python mainDRL.py --Netw_topo_id 10 --Eval_At_Customized_Points 0 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_3
+	python mainDRL.py --Netw_topo_id 10 --Eval_At_Customized_Points 0 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_4
