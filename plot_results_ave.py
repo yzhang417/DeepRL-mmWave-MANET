@@ -92,26 +92,38 @@ for i in range(num_realization):
             print('No file %d for MAB\\' %i)
 
         print('Read file %d\\' %i)
-ave_evolution_rate_ckpt = np.append(ave_evolution_rate_ckpt_MAB,ave_evolution_rate_ckpt_DRL.reshape((1,12)),axis=0)
-ave_evolution_delay_ckpt = np.append(ave_evolution_delay_ckpt_MAB,ave_evolution_delay_ckpt_DRL.reshape((1,12)),axis=0)
-ave_evolution_ratio_blockage_ckpt = np.append(ave_evolution_ratio_blockage_ckpt_MAB,ave_evolution_ratio_blockage_ckpt_DRL.reshape((1,12)),axis=0)
-min_evolution_delay_ckpt = np.append(min_evolution_delay_ckpt_MAB,min_evolution_delay_ckpt_DRL.reshape((1,12)),axis=0)
-max_evolution_delay_ckpt = np.append(max_evolution_delay_ckpt_MAB,max_evolution_delay_ckpt_DRL.reshape((1,12)),axis=0)
+
+# Complementary parameters
+scheme_setting_list = get_MAB_scheme_setting()
+N_schemes = len(scheme_setting_list)
+eval_ites_DRL = args_DRL.eval_ites
+try:
+    eval_ites_MAB = args_MAB.eval_ites
+except:
+    eval_ites_MAB = eval_ites_DRL
+costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])
+num_check_points = len(costomized_check_point)
+try:
+    ave_evolution_rate_ckpt = np.append(ave_evolution_rate_ckpt_MAB,ave_evolution_rate_ckpt_DRL.reshape((1,num_check_points)),axis=0)
+    ave_evolution_delay_ckpt = np.append(ave_evolution_delay_ckpt_MAB,ave_evolution_delay_ckpt_DRL.reshape((1,num_check_points)),axis=0)
+    ave_evolution_ratio_blockage_ckpt = np.append(ave_evolution_ratio_blockage_ckpt_MAB,ave_evolution_ratio_blockage_ckpt_DRL.reshape((1,num_check_points)),axis=0)
+    min_evolution_delay_ckpt = np.append(min_evolution_delay_ckpt_MAB,min_evolution_delay_ckpt_DRL.reshape((1,num_check_points)),axis=0)
+    max_evolution_delay_ckpt = np.append(max_evolution_delay_ckpt_MAB,max_evolution_delay_ckpt_DRL.reshape((1,num_check_points)),axis=0)
+    target_scheme = range(N_schemes)
+except:
+    ave_evolution_rate_ckpt = np.tile(ave_evolution_rate_ckpt_DRL.reshape((1,num_check_points)),(N_schemes,1))
+    ave_evolution_delay_ckpt = np.tile(ave_evolution_delay_ckpt_DRL.reshape((1,num_check_points)),(N_schemes,1))
+    ave_evolution_ratio_blockage_ckpt = np.tile(ave_evolution_ratio_blockage_ckpt_DRL.reshape((1,num_check_points)),(N_schemes,1))
+    min_evolution_delay_ckpt = np.tile(min_evolution_delay_ckpt_DRL.reshape((1,num_check_points)),(N_schemes,1))
+    max_evolution_delay_ckpt = np.tile(max_evolution_delay_ckpt_DRL.reshape((1,num_check_points)),(N_schemes,1))
+    target_scheme = [7]
 
 #----------------------------------------------------------------
 # Results from training phase
 #----------------------------------------------------------------
-# Complementary parameters
-scheme_setting_list = get_MAB_scheme_setting()
-N_schemes = len(scheme_setting_list)    
-eval_ites_MAB = args_MAB.eval_ites
-eval_ites_DRL = args_DRL.eval_ites
-costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])
-figID = 100
-
-
 
 ############################# Average data rate at each check point
+figID = 100
 ite_duration = args_DRL.slots * env_parameter.t_slot
 figID += 1
 plt.figure(num=figID,figsize=(10,6),dpi=1200)
