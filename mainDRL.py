@@ -40,10 +40,11 @@ def main():
     parser.add_argument('--output', default=None, help='output folder of training results')
     parser.add_argument('--save_memory', default=0, help='save memory')
     # Training process
+    parser.add_argument('--netw_topo_changing', default=0, type=int, help='Changing the network during training')
     parser.add_argument('--iterations', default=240, type=int, help='number of episodes')
     parser.add_argument('--slots', default=1500, type=int, help='number of slots in a single episode')
     parser.add_argument('--batches', default=5, type=int, help='number of slots in a single batch')
-    parser.add_argument('--eval_loops', default=20, type=int, help='number of evaluations for a checkpoint')
+    parser.add_argument('--eval_loops', default=10, type=int, help='number of evaluations for a checkpoint')
     parser.add_argument('--eval_ites', default=1, type=int, help='number of iterations before each ckpt evaluation')
     parser.add_argument('--clip_queues', default=0, type=int, help='clip the queue at the end of each iteration')
     # Learning part
@@ -139,6 +140,7 @@ def main():
         clipping_critic = args.clipping_critic
         clip_queues = args.clip_queues
         Eval_At_Customized_Points = args.Eval_At_Customized_Points
+        netw_topo_changing = args.netw_topo_changing
         
         # Training
         print('\n------------------------------------------------------')
@@ -150,7 +152,7 @@ def main():
         training(env, actor_critic_net, optimizer, scheduler, batches, slots, iterations,\
                  gamma, lambd, value_coeff, entropy_coeff,\
                  clip_param, decaying_clip_param, clipping_critic,\
-                 eval_loops, eval_ites, device, clip_queues, Eval_At_Customized_Points)
+                 eval_loops, eval_ites, device, clip_queues, Eval_At_Customized_Points, netw_topo_changing)
         
         # Save the trained model result
         trained_model_filename = output_folder+'trained_model_DRL_netwTopo'+str(Netw_topo_id)+'.pt'

@@ -31,12 +31,44 @@ def env_init(Netw_topo_id):
     # -------------------------------------
     # Network topology
     # -------------------------------------    
-    if Netw_topo_id == 1:
-        workload = 3.5 * 1e9;                              # Total downlink data stream rate
+    if Netw_topo_id == 10 or Netw_topo_id == 3:  # Scenario presented in the paper
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
         radius = np.array([10, 10, 15, 25, 30]);  # Distance between Tx and Rx
         angle =  np.array([5, 85, 45, 10, 80]);   # Angle between Tx and Rx
-        lambda_ratio = np.array([0, 10, 0, 0, 0]); # Ratio of arrival rate
+        lambda_ratio = np.array([1, 3, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
+        target_prob_blockage_D2D = 0.05
+    if Netw_topo_id == 11:  # Added for changinig enviroment from scenario 3
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
+        N_UE = 5; # Number of users 
+        radius = np.array([10+5, 10+5, 15, 25-5, 30+5]); # Distance between Tx and Rx after enviromental change
+        angle = np.array([5-10, 85-5, 45-5, 10+5, 80-5]);  # Angle between Tx and Rx after enviromental change
+        lambda_ratio = np.array([1, 3, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
+        target_prob_blockage_D2D = 0.05
+    if Netw_topo_id == 12:  # Added for changinig enviroment from scenario 3
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
+        N_UE = 5; # Number of users 
+        radius = np.array([25-5, 30+5, 15, 10+5, 10+5]); # Distance between Tx and Rx after enviromental change
+        angle = np.array([10+5, 80-5, 45-5, 5-10, 85-5]);  # Angle between Tx and Rx after enviromental change
+        lambda_ratio = np.array([1, 3, 1, 1.5, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
+        target_prob_blockage_D2D = 0.05
+    if Netw_topo_id == 13:  # Added for changinig enviroment from scenario 3
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
+        N_UE = 5; # Number of users 
+        radius = np.array([25-5, 30+5, 15, 10+5, 10+5]); # Distance between Tx and Rx after enviromental change
+        angle = np.array([10+5, 80-5, 45-5, 5-10, 85-5]);  # Angle between Tx and Rx after enviromental change
+        lambda_ratio = np.array([1, 2, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.7, 0.5, 0.1, 0.05, 0.05]); # Average percentage of slots in blockage
+        target_prob_blockage_D2D = 0.05
+    if Netw_topo_id == 14: 
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
+        N_UE = 5; # Number of users 
+        radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
+        angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
+        lambda_ratio = np.array([1, 3, 1, 1, 1]); # Ratio of arrival rate
         target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 2:
@@ -47,7 +79,23 @@ def env_init(Netw_topo_id):
         lambda_ratio = np.array([1, 100, 1, 1, 1]); # Ratio of arrival rate
         target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
-    if Netw_topo_id == 3:  # Scenario presented in the paper
+    if Netw_topo_id == 33:  
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
+        N_UE = 3; # Number of users 
+        radius = np.array([10, 10, 15]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45]);   # Angle between Tx and Rx
+        lambda_ratio = np.array([1, 3, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8]); # Average percentage of slots in blockage
+        target_prob_blockage_D2D = 0.05
+    if Netw_topo_id == 4: 
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
+        N_UE = 4; # Number of users 
+        radius = np.array([10, 10, 15, 25]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45, 10]);   # Angle between Tx and Rx
+        lambda_ratio = np.array([1, 3, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05]); # Average percentage of slots in blockage
+        target_prob_blockage_D2D = 0.05
+    if Netw_topo_id == 5:  
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
         radius = np.array([10, 10, 15, 25, 30]);  # Distance between Tx and Rx
@@ -55,15 +103,22 @@ def env_init(Netw_topo_id):
         lambda_ratio = np.array([1, 3, 1, 1, 1]); # Ratio of arrival rate
         target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
-    if Netw_topo_id == 4: 
+    if Netw_topo_id == 6: 
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
-        N_UE = 5; # Number of users 
-        radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
-        angle =  np.array([0, 45, 35, 5, 20]);    # Angle between Tx and Rx
-        lambda_ratio = np.array([1, 3, 1, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
+        N_UE = 6; # Number of users 
+        radius = np.array([10, 10, 15, 25, 30, 20]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45, 10, 80, 28]);   # Angle between Tx and Rx
+        lambda_ratio = np.array([1, 3, 1, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
-        
+    if Netw_topo_id == 7: 
+        workload = 1.0 * 1e9;                              # Total downlink data stream rate
+        N_UE = 7; # Number of users 
+        radius = np.array([10, 10, 15, 25, 30, 20, 15]);  # Distance between Tx and Rx
+        angle =  np.array([5, 85, 45, 10, 80, 28, 30]);   # Angle between Tx and Rx
+        lambda_ratio = np.array([1, 3, 1, 1, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05, 0.05, 0.05]); # Average percentage of slots in blockage
+        target_prob_blockage_D2D = 0.05
     target_prob_blockage = np.ones((N_UE,N_UE)) - np.diag(np.ones(N_UE))
     target_prob_blockage = target_prob_blockage * target_prob_blockage_D2D + np.diag(target_prob_blockage_to_AP)
     Xcoor_init, Ycoor_init = pol2cart(np.deg2rad(angle),radius);
@@ -502,11 +557,13 @@ class envs():
         
         # Sanity check of queue consitancy and npkts consitancy
         if any(np.squeeze(np.sum(self.npkts_departure_evolution,axis=0)) != np.squeeze(np.sum(self.delay_dist,axis=0))):
-            pdb.set_trace()
-            sys.exit('Number of packets delivered are not consistant!')
+            #pdb.set_trace()
+            #sys.exit('Number of packets delivered are not consistant!')
+            print('Number of packets delivered are not consistant!')
         if any(np.sum(self.current_Queue_dist_by_delay,axis=0) != np.squeeze(self.Queue[self.ct,:])):
-            pdb.set_trace()
-            sys.exit('Queue lengths are not consistant!')
+            #pdb.set_trace()
+            #sys.exit('Queue lengths are not consistant!')
+            print('Queue lengths are not consistant!')
         
         # Update the state
         state.est_depart = est_depart

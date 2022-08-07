@@ -23,7 +23,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
              batches, slots, iterations, \
              gamma, lambd, value_coeff, entropy_coeff, \
              clip_param, decaying_clip_param, clipping_critic,\
-             eval_loops, eval_ites, device, clip_queues, Eval_At_Customized_Points):
+             eval_loops, eval_ites, device, clip_queues, Eval_At_Customized_Points, netw_topo_changing):
     # print option
     np.set_printoptions(suppress=True)
     np.set_printoptions(precision=2)
@@ -45,6 +45,8 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
     # Detecting anomaly
     # torch.autograd.set_detect_anomaly(True)
     
+    num_netw_topo_changing = 0;
+    
     # Loop of episodes (also called epochs or iterations)
     for ite in range(iterations):
         
@@ -63,7 +65,25 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
         if ite == 0:
             state = env.reset()  # Initial state for an epiosde
         else:
-            if clip_queues:
+            if netw_topo_changing and num_netw_topo_changing == 0 and ite>=iterations/4 and ite<iterations*2/4:
+                env_parameter_new = env_init(11)
+                env = envs(env_parameter_new,slots)
+                num_netw_topo_changing = 1;
+                print('Network Changed to network topo 11')
+                state = env.reset()
+            elif netw_topo_changing and num_netw_topo_changing == 1 and ite>=iterations*2/4 and ite<iterations*3/4:
+                env_parameter_new = env_init(12)
+                env = envs(env_parameter_new,slots)
+                num_netw_topo_changing = 2;
+                print('Network Changed to network topo 12')
+                state = env.reset()
+            elif netw_topo_changing and num_netw_topo_changing == 2 and ite>=iterations*3/4:
+                env_parameter_new = env_init(13)
+                env = envs(env_parameter_new,slots)
+                num_netw_topo_changing = 3;
+                print('Network Changed to network topo 13')
+                state = env.reset()
+            elif clip_queues:
                 state = env.reset()
             else:
                 env.reset()
