@@ -39,7 +39,7 @@ def env_init(Netw_topo_id):
         lambda_ratio = np.array([1, 3, 1, 1, 1]); # Ratio of arrival rate
         target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
-    if Netw_topo_id == 11:  # Added for changinig enviroment from scenario 3
+    if Netw_topo_id == 11:  # Added for changinig enviroment from scenario 3 (Netw_topo_id == 10 or Netw_topo_id == 3)
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
         radius = np.array([10+5, 10+5, 15, 25-5, 30+5]); # Distance between Tx and Rx after enviromental change
@@ -63,7 +63,7 @@ def env_init(Netw_topo_id):
         lambda_ratio = np.array([1, 2, 1, 1, 1]); # Ratio of arrival rate
         target_prob_blockage_to_AP = np.array([0.7, 0.5, 0.1, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
-    if Netw_topo_id == 14: 
+    if Netw_topo_id == 14: # Added for changinig enviroment from scenario 3
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
         radius = np.array([10, 20, 30, 40, 50]);  # Distance between Tx and Rx
