@@ -227,7 +227,14 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
         # Evaluation at checkpoint
         To_Evaluate = False;
         if Eval_At_Customized_Points:
-            costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])-1;
+            if netw_topo_changing == 0:
+                costomized_check_point = np.array([1,4,7,10,20,40,60,80,100,150,200,240])-1;
+            else:
+                costomized_check_point_base = np.array([1,2,3,4,5,6,7,8,9,10,12,14,16,18,20,30,40,50,60,80,100])-1;
+                #costomized_check_point_base = np.array([1,iterations/4])-1;
+                costomized_check_point = costomized_check_point_base
+                for i in range(3):
+                    costomized_check_point = np.append(costomized_check_point, (costomized_check_point_base+iterations/4*(i+1)))
             if ite in costomized_check_point.tolist():
                 To_Evaluate = True
         else:
@@ -273,8 +280,6 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             evolution_rate_ckpt.append(Ave_npkts_dep_per_slot*env.env_parameter.mean_packet_size/env.env_parameter.t_slot/1e9)
             evolution_delay_ckpt.append(ave_delay_in_slots)
             evolution_ratio_blockage_ckpt.append(Ave_ratio_under_blockage)     
-            
-            #breakpoint()
             
         # Code Profiler
         if profiling_code and ite == 0:

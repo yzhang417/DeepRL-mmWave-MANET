@@ -50,7 +50,7 @@ def plot_network_topology(env_parameter, output_folder, show_mobility_trace, sho
     ax_netw_topo.grid(b=True, which='major', color='#666666', linestyle='-')
     for u in range(env_parameter.N_UE):
         ax_netw_topo.plot(env_parameter.Xcoor_init[u],env_parameter.Ycoor_init[u],\
-                          '*', label='UE '+str(u),c=ue_color[u])
+                          '*', label='UE '+str(u)+ ' ($\\tilde{p}_{'+str(u)+'}^{B}$ ='+ str(env_parameter.target_prob_blockage[u][u]) +')',c=ue_color[u])
         ax_netw_topo.plot(env_parameter.Xcoor_init[u] + Xcoor_border,\
                           env_parameter.Ycoor_init[u] + Ycoor_border,\
                           '-', label='Border of UE '+str(u),c=ue_color[u])
@@ -73,6 +73,8 @@ def plot_network_topology(env_parameter, output_folder, show_mobility_trace, sho
     else:
         plt.savefig(output_folder+'Network_topology_'+str(env_parameter.Netw_topo_id)+'.eps',\
                     format='eps', facecolor='w', transparent=False, dpi=1200)
+        plt.savefig(output_folder+'Network_topology_'+str(env_parameter.Netw_topo_id)+'.pdf',\
+                    format='pdf', facecolor='w', transparent=False, dpi=1200)
     if show_plot:
         plt.show()
     else:

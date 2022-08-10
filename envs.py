@@ -31,7 +31,7 @@ def env_init(Netw_topo_id):
     # -------------------------------------
     # Network topology
     # -------------------------------------    
-    if Netw_topo_id == 10 or Netw_topo_id == 3:  # Scenario presented in the paper
+    if Netw_topo_id == 3 or Netw_topo_id == 10:  # Scenario presented in the paper
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
         radius = np.array([10, 10, 15, 25, 30]);  # Distance between Tx and Rx
@@ -39,29 +39,29 @@ def env_init(Netw_topo_id):
         lambda_ratio = np.array([1, 3, 1, 1, 1]); # Ratio of arrival rate
         target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
-    if Netw_topo_id == 11:  # Added for changinig enviroment from scenario 3 (Netw_topo_id == 10 or Netw_topo_id == 3)
+    if Netw_topo_id == 11:  # Added for changinig enviroment from scenario 3
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
-        radius = np.array([10+5, 10+5, 15, 25-5, 30+5]); # Distance between Tx and Rx after enviromental change
+        radius = np.array([10-5, 10-5, 15, 25-5, 30+5]); # Distance between Tx and Rx after enviromental change
         angle = np.array([5-10, 85-5, 45-5, 10+5, 80-5]);  # Angle between Tx and Rx after enviromental change
         lambda_ratio = np.array([1, 3, 1, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
+        target_prob_blockage_to_AP = np.array([0, 0.1, 0.7, 0.05, 0.25]); # sAverage percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 12:  # Added for changinig enviroment from scenario 3
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
-        radius = np.array([25-5, 30+5, 15, 10+5, 10+5]); # Distance between Tx and Rx after enviromental change
-        angle = np.array([10+5, 80-5, 45-5, 5-10, 85-5]);  # Angle between Tx and Rx after enviromental change
-        lambda_ratio = np.array([1, 3, 1, 1.5, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.8, 0.05, 0.05]); # Average percentage of slots in blockage
+        radius = np.array([25-5, 30+5, 15, 20, 10+5]); # Distance between Tx and Rx after enviromental change
+        angle = np.array([10+5, 80-5, 45-5, 35, 85-5]);  # Angle between Tx and Rx after enviromental change
+        lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.1, 0.2, 0.5, 0.8, 0.05]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 13:  # Added for changinig enviroment from scenario 3
         workload = 1.0 * 1e9;                              # Total downlink data stream rate
         N_UE = 5; # Number of users 
-        radius = np.array([25-5, 30+5, 15, 10+5, 10+5]); # Distance between Tx and Rx after enviromental change
-        angle = np.array([10+5, 80-5, 45-5, 5-10, 85-5]);  # Angle between Tx and Rx after enviromental change
-        lambda_ratio = np.array([1, 2, 1, 1, 1]); # Ratio of arrival rate
-        target_prob_blockage_to_AP = np.array([0.7, 0.5, 0.1, 0.05, 0.05]); # Average percentage of slots in blockage
+        radius = np.array([25, 30, 18, 10, 10]); # Distance between Tx and Rx after enviromental change
+        angle = np.array([10, 80, 20, 5, 85]);  # Angle between Tx and Rx after enviromental change
+        lambda_ratio = np.array([1, 1, 1, 1, 1]); # Ratio of arrival rate
+        target_prob_blockage_to_AP = np.array([0.05, 0.05, 0.05, 0.05, 0.75]); # Average percentage of slots in blockage
         target_prob_blockage_D2D = 0.05
     if Netw_topo_id == 14: # Added for changinig enviroment from scenario 3
         workload = 1.0 * 1e9;                              # Total downlink data stream rate

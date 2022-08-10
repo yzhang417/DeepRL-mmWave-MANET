@@ -209,13 +209,15 @@ def action_ndarray_to_action_index(action_ndarray,num_type_of_action,num_action_
 #-----------------------------------------------------------
 def action_sanity_check(slot, action, state):
     if slot>0 and action.UE_ID_BS2UE_Link<0:
-        pdb.set_trace()
-        sys.exit('Error: constraint violated: negative UE index occurs')
+        #pdb.set_trace()
+        #sys.exit('Error: constraint violated: negative UE index occurs')
+        print('Error: constraint violated: negative UE index occurs')
     violation_tracking = state.Is_Tracking and \
     ((action.UE_ID_BS2UE_Link != state.UE_ID_BS2UE_Link_Last_Slot) or state.Is_D2D_Link_Active)
     if violation_tracking:
-        pdb.set_trace()
-        sys.exit('Error: constraint violated: tracking order is not performed')
+        #pdb.set_trace()
+        #sys.exit('Error: constraint violated: tracking order is not performed')
+        print('Error: constraint violated: tracking order is not performed')
     violation_d2d_link = state.Is_D2D_Link_Active and\
     (action.UE_ID_BS2UE_Link == state.Tx_ID_D2D_Link or\
      action.UE_ID_BS2UE_Link == state.Rx_ID_D2D_Link or\
