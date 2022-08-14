@@ -87,7 +87,6 @@ train40:
 	python mainMAB.py --Netw_topo_id 3 --output train_process_net3/realization_38
 	python mainMAB.py --Netw_topo_id 3 --output train_process_net3/realization_39
 
-
 train50:
 	python mainDRL.py --Netw_topo_id 3 --output train_process_net3/realization_40
 	python mainDRL.py --Netw_topo_id 3 --output train_process_net3/realization_41
@@ -227,3 +226,18 @@ train_net_changing:
 	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_2
 	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_3
 	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_4
+    
+train_net_changing_per_ue:
+	python mainDRL.py --Netw_topo_id 3 --iterations 100 --netw_topo_changing 1 --output train_process_net10/realization_100
+	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_10
+	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_11
+	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_12
+	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_13
+	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_14
+    
+train_net_changing_per_ue2:
+	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_15
+	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_16
+	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_17
+	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_18
+	python mainDRL.py --Netw_topo_id 3 --iterations 400 --netw_topo_changing 1 --output train_process_net10/realization_19

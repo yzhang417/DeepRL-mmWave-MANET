@@ -148,7 +148,7 @@ def main():
         print('-------------------------------------------------------')                
         evolution_queue_length, evolution_reward, evolution_rate_ckpt, evolution_delay_ckpt, evolution_ratio_blockage_ckpt,\
         Queue_Eval, Delay_dist_Eval, Ave_num_using_relay_detailed, Ave_num_bw_selection_detailed,\
-        Ave_num_doing_tracking_detailed, Ave_ratio_under_blockage_detailed, actor_critic_net = \
+        Ave_num_doing_tracking_detailed, Ave_ratio_under_blockage_detailed, actor_critic_net, evolution_delay_ckpt_per_UE = \
         training(env, actor_critic_net, optimizer, scheduler, batches, slots, iterations,\
                  gamma, lambd, value_coeff, entropy_coeff,\
                  clip_param, decaying_clip_param, clipping_critic,\
@@ -173,7 +173,8 @@ def main():
                 'evolution_reward': evolution_reward,
                 'evolution_rate_ckpt': evolution_rate_ckpt,
                 'evolution_delay_ckpt': evolution_delay_ckpt,
-                'evolution_ratio_blockage_ckpt': evolution_ratio_blockage_ckpt
+                'evolution_ratio_blockage_ckpt': evolution_ratio_blockage_ckpt,
+                'evolution_delay_ckpt_per_UE' : evolution_delay_ckpt_per_UE
             }
         else:
             training_results_dict = {
@@ -184,6 +185,7 @@ def main():
                 'evolution_rate_ckpt': evolution_rate_ckpt,
                 'evolution_delay_ckpt': evolution_delay_ckpt,
                 'evolution_ratio_blockage_ckpt': evolution_ratio_blockage_ckpt,
+                'evolution_delay_ckpt_per_UE' : evolution_delay_ckpt_per_UE,
                 'Queue_Eval': Queue_Eval,
                 'Delay_dist_Eval': Delay_dist_Eval,
                 'Ave_num_using_relay_detailed': Ave_num_using_relay_detailed,

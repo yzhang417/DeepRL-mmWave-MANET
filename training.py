@@ -33,6 +33,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
     evolution_queue_length = [] # Evolution of the queue length of the whole training process
     evolution_rate_ckpt = [] # Evolution of average data rate at each checking point for Slots time slots
     evolution_delay_ckpt = [] # Evolution of average delay at each checking point for Slots time slots
+    evolution_delay_ckpt_per_UE = [] # Evolution of average delay at each checking point for each UE for Slots time slots
     evolution_ratio_blockage_ckpt = [] # Evolution of ratio under blocakge at each checking point for Slots time slots
     
     # Init
@@ -269,6 +270,12 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             np.sum(np.mean(Delay_dist_Eval,axis=0))
             ave_delay_in_slots = \
             np.dot(np.transpose(ave_delay_in_slots_dist),np.asarray(range(len(ave_delay_in_slots_dist))))
+            
+            ## Delay Per UE
+            ave_delay_in_slots_dist_per_ue = np.mean(Delay_dist_Eval,axis=0)/np.sum(np.mean(Delay_dist_Eval,axis=0),axis=0)
+            ave_delay_in_slots_per_ue = np.dot(np.transpose(ave_delay_in_slots_dist_per_ue),np.asarray(range(len(ave_delay_in_slots_dist_per_ue))))
+            ## Delay Per UE
+            
             print('Average delay of packets in slots')
             print(ave_delay_in_slots)
             t_Eval = time.time() - t_Eval_start
@@ -279,6 +286,7 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             # Save the parameter evolution            
             evolution_rate_ckpt.append(Ave_npkts_dep_per_slot*env.env_parameter.mean_packet_size/env.env_parameter.t_slot/1e9)
             evolution_delay_ckpt.append(ave_delay_in_slots)
+            evolution_delay_ckpt_per_UE.append(ave_delay_in_slots_per_ue)
             evolution_ratio_blockage_ckpt.append(Ave_ratio_under_blockage)     
             
         # Code Profiler
@@ -295,4 +303,4 @@ def training(env, actor_critic_net, ac_optimizer, scheduler,\
             print(s.getvalue())
     
     # Return results
-    return evolution_queue_length, evolution_reward, evolution_rate_ckpt, evolution_delay_ckpt, evolution_ratio_blockage_ckpt, Queue_Eval, Delay_dist_Eval, Ave_num_using_relay_detailed, Ave_num_bw_selection_detailed, Ave_num_doing_tracking_detailed, Ave_ratio_under_blockage_detailed, actor_critic_net
+    return evolution_queue_length, evolution_reward, evolution_rate_ckpt, evolution_delay_ckpt, evolution_ratio_blockage_ckpt, Queue_Eval, Delay_dist_Eval, Ave_num_using_relay_detailed, Ave_num_bw_selection_detailed, Ave_num_doing_tracking_detailed, Ave_ratio_under_blockage_detailed, actor_critic_net, evolution_delay_ckpt_per_UE
